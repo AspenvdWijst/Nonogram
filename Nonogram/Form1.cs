@@ -1,6 +1,10 @@
 namespace Nonogram
 {
     using System;
+    using System.IO;
+    using Newtonsoft.Json;
+    using System.Threading;
+    using System.Threading.Tasks;
     using System.Drawing;
     using System.Windows.Forms;
 
@@ -155,17 +159,25 @@ namespace Nonogram
 
         private async void CheckWinCondition()
         {
-            for (int row = 0; row < GridSize; row++)
+            bool isSolved = await Task.Run(() =>
             {
-                for (int col = 0; col < GridSize; col++)
+                for (int row = 0; row < GridSize; row++)
                 {
-                    if ((playerGrid[row, col] == 1) != solutionGrid[row, col])
+                    for (int col = 0; col < GridSize; col++)
                     {
-                        return; // Not solved yet
+                        if ((playerGrid[row, col] == 1) != solutionGrid[row, col])
+                        {
+                            return false; // Puzzle not solved yet
+                        }
                     }
                 }
+                return true;
+            });
+
+            if (isSolved)
+            {
+                MessageBox.Show("Puzzle Solved!", "Nonogram", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            MessageBox.Show("Puzzle Solved!", "Nonogram", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
 
