@@ -8,12 +8,15 @@ namespace Nonogram
     using System.Drawing;
     using System.Windows.Forms;
 
+
     public partial class Form1 : Form
     {
         private const int CellSize = 50;
         private const int GridSize = 5;
         private const int ClueSize = 100;
         private const int CluePadding = 10;
+        private const int AnimationSpeed = 10;
+        private Settings settings;
 
         private bool[,] solutionGrid;
         private int[,] playerGrid;
@@ -21,6 +24,7 @@ namespace Nonogram
         public Form1()
         {
             InitializeComponent();
+            settings = Settings.Load();
             this.Paint += new PaintEventHandler(this.OnPaint);
             this.MouseClick += new MouseEventHandler(this.OnMouseClick);
             this.Size = new Size(600, 600);
@@ -138,23 +142,53 @@ namespace Nonogram
 
             if (row >= 0 && row < GridSize && col >= 0 && col < GridSize)
             {
-                await Task.Run(() =>
+                if (e.Button == MouseButtons.Left)
                 {
-                    if (e.Button == MouseButtons.Left)
+                    // Toggle between empty and filled
+                    if (playerGrid[row, col] == 1)
+                        playerGrid[row, col] = 0; // If already filled, empty it
+                    else
                     {
-                        // Toggle between empty and filled
-                        playerGrid[row, col] = (playerGrid[row, col] == 1) ? 0 : 1;
+                        if (settings.animationsEnabled)
+                            await AnimateFillCell(row, col);
+                        else
+                            playerGrid[row, col] = 1;
                     }
-                    else if (e.Button == MouseButtons.Right)
-                    {
-                        // Toggle between empty and marked
-                        playerGrid[row, col] = (playerGrid[row, col] == 2) ? 0 : 2;
-                    }
-                });
+                }
+                else if (e.Button == MouseButtons.Right)
+                {
+                    // Toggle between empty and X
+                    playerGrid[row, col] = (playerGrid[row, col] == 2) ? 0 : 2;
+                }
 
                 this.Invalidate(); // Redraw the form
                 CheckWinCondition();
             }
+        }
+
+        private async Task AnimateFillCell(int row, int col)
+        {
+            int steps = 10; // Number of animation steps
+            int delay = AnimationSpeed; // Speed of animation
+
+            for (int i = 0; i <= steps; i++)
+            {
+                float scale = (float)i / steps;
+                using (Graphics g = this.CreateGraphics())
+                {
+                    int gridStartX = ClueSize;
+                    int gridStartY = ClueSize;
+                    int x = gridStartX + col * CellSize;
+                    int y = gridStartY + row * CellSize;
+
+                    g.FillRectangle(Brushes.Black, x + (CellSize * (1 - scale)) / 2,
+                                    y + (CellSize * (1 - scale)) / 2,
+                                    CellSize * scale, CellSize * scale);
+                }
+                await Task.Delay(delay);
+            }
+            playerGrid[row, col] = 1;
+            this.Invalidate(); // Finalize drawing
         }
 
         private async void CheckWinCondition()
@@ -217,6 +251,25 @@ namespace Nonogram
             return string.IsNullOrEmpty(clue) ? "0" : clue.Trim();
         }
 
+        private async Task AnimateBoardReset()
+        {
+            int steps = 10; // Number of fade-out steps
+            int delay = AnimationSpeed; // Speed of animation
+
+            for (int i = steps; i >= 0; i--)
+            {
+                float alpha = (float)i / steps;
+                using (Graphics g = this.CreateGraphics())
+                {
+                    g.FillRectangle(new SolidBrush(Color.FromArgb((int)(255 * alpha), Color.White)), ClueSize, ClueSize, GridSize * CellSize, GridSize * CellSize);
+                }
+                await Task.Delay(delay);
+            }
+
+            playerGrid = new int[GridSize, GridSize];
+            this.Invalidate(); // Redraw after animation
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
 
@@ -229,12 +282,15 @@ namespace Nonogram
 
         private async void ResetButton_Click(object sender, EventArgs e)
         {
-            await Task.Run(() =>
+            if (settings.animationsEnabled)
+            {
+                await AnimateBoardReset();
+            }
+            else
             {
                 playerGrid = new int[GridSize, GridSize];
-            });
-
-            this.Invalidate();
+                this.Invalidate();
+            }
         }
 
         private async void NewPuzzleBtn_Click(object sender, EventArgs e)
