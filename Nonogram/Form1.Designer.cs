@@ -118,7 +118,6 @@
             SizeComboBox.Location = new Point(1691, 59);
             SizeComboBox.Name = "SizeComboBox";
             SizeComboBox.Size = new Size(121, 23);
-            SizeComboBox.Sorted = true;
             SizeComboBox.TabIndex = 8;
             // 
             // label3

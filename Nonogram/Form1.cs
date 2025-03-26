@@ -44,7 +44,7 @@ namespace Nonogram
         private void ComboBoxInfo()
         {
             SizeComboBox.Items.AddRange(new string[] { "5x5", "10x10", "15x15", "20x20" });
-            SizeComboBox.SelectedIndex = 2;
+            SizeComboBox.SelectedIndex = 0;
             SizeComboBox.SelectedIndexChanged += SizeComboBox_SelectedIndexChanged;
         }
 
@@ -388,11 +388,20 @@ namespace Nonogram
         {
             foreach (Control ctrl in this.Controls)
             {
-                if (ctrl is Button || ctrl is Panel)
+                if (ctrl is Button || ctrl is Panel || ctrl is ComboBox)
                 {
                     ctrl.Enabled = true;
                 }
             }
+        }
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure you want to exit? Unsaved progress will be lost", "Exit Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.No)
+            {
+                e.Cancel = true;
+            }
+            base.OnFormClosing(e);
         }
 
         private void Form1_Load(object sender, EventArgs e)
