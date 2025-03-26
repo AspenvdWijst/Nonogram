@@ -270,6 +270,65 @@ namespace Nonogram
             this.Invalidate(); // Redraw after animation
         }
 
+        private void SimulateClick(int row, int col, MouseButtons button)
+        {
+            int gridStartX = ClueSize;
+            int gridStartY = ClueSize;
+
+            int x = gridStartX + col * CellSize + CellSize / 2;
+            int y = gridStartY + row * CellSize + CellSize / 2;
+
+            MouseEventArgs clickEvent = new MouseEventArgs(button, 1, x, y, 0);
+            OnMouseClick(this, clickEvent);
+        }
+
+        private async void SolvePuzzle()
+        {
+            DisableUI();
+            for (int row = 0; row < GridSize; row++)
+            {
+                for (int col = 0; col < GridSize; col++)
+                {
+                    bool shouldBeFilled = solutionGrid[row, col];
+
+                    if (shouldBeFilled && playerGrid[row, col] != 1)
+                    {
+                        SimulateClick(row, col, MouseButtons.Left);
+                    }
+                    else if (!shouldBeFilled && playerGrid[row, col] != 2)
+                    {
+                        SimulateClick(row, col, MouseButtons.Right);
+                    }
+
+                    await Task.Delay(100); // Smooth animation effect
+                }
+            }
+            EnableUI();
+        }
+
+        private void DisableUI()
+        {
+            foreach (Control ctrl in this.Controls)
+            {
+                if (ctrl is Button || ctrl is Panel)
+                {
+                    ctrl.Enabled = false;
+                }
+            }
+        }
+
+        private void EnableUI()
+        {
+            foreach (Control ctrl in this.Controls)
+            {
+                if (ctrl is Button || ctrl is Panel)
+                {
+                    ctrl.Enabled = true;
+                }
+            }
+        }
+
+
         private void Form1_Load(object sender, EventArgs e)
         {
 
@@ -301,6 +360,13 @@ namespace Nonogram
             });
 
             this.Invalidate();
+        }
+
+        private void SolveBtn_Click(object sender, EventArgs e)
+        {
+            ResetButton.Enabled = false;
+            NewPuzzleBtn.Enabled = false;
+            SolvePuzzle();  
         }
     }
 }

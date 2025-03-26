@@ -35,6 +35,7 @@
             pictureBox2 = new PictureBox();
             ResetButton = new Button();
             NewPuzzleBtn = new Button();
+            SolveBtn = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             SuspendLayout();
@@ -98,11 +99,22 @@
             NewPuzzleBtn.UseVisualStyleBackColor = true;
             NewPuzzleBtn.Click += NewPuzzleBtn_Click;
             // 
+            // SolveBtn
+            // 
+            SolveBtn.Location = new Point(419, 402);
+            SolveBtn.Name = "SolveBtn";
+            SolveBtn.Size = new Size(75, 69);
+            SolveBtn.TabIndex = 7;
+            SolveBtn.Text = "Solve puzzle";
+            SolveBtn.UseVisualStyleBackColor = true;
+            SolveBtn.Click += SolveBtn_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(584, 561);
+            Controls.Add(SolveBtn);
             Controls.Add(NewPuzzleBtn);
             Controls.Add(ResetButton);
             Controls.Add(pictureBox2);
@@ -126,5 +138,6 @@
         private PictureBox pictureBox2;
         private Button ResetButton;
         private Button NewPuzzleBtn;
+        private Button SolveBtn;
     }
 }
