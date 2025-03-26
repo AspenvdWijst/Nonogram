@@ -31,7 +31,7 @@ namespace Nonogram
             this.SetStyle(ControlStyles.AllPaintingInWmPaint |
                           ControlStyles.UserPaint |
                           ControlStyles.OptimizedDoubleBuffer, true);
-            InitializeComboBox();
+            ComboBoxInfo();
             InitializeGrids();
         }
 
@@ -39,6 +39,13 @@ namespace Nonogram
         {
             solutionGrid = GenerateRandomSolution(GridSize, GridSize);
             playerGrid = new int[GridSize, GridSize];
+        }
+
+        private void ComboBoxInfo()
+        {
+            SizeComboBox.Items.AddRange(new string[] { "5x5", "10x10", "15x15", "20x20" });
+            SizeComboBox.SelectedIndex = 2;
+            SizeComboBox.SelectedIndexChanged += SizeComboBox_SelectedIndexChanged;
         }
 
         private void SizeComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -161,6 +168,42 @@ namespace Nonogram
             }
         }
 
+        private string GetRowClue(int row)
+        {
+            string clue = "";
+            int count = 0;
+
+            for (int col = 0; col < GridSize; col++)
+            {
+                if (solutionGrid[row, col]) count++;
+                else if (count > 0)
+                {
+                    clue += count + " ";
+                    count = 0;
+                }
+            }
+            if (count > 0) clue += count;
+            return string.IsNullOrEmpty(clue) ? "0" : clue.Trim();
+        }
+
+        private string GetColumnClue(int col)
+        {
+            string clue = "";
+            int count = 0;
+
+            for (int row = 0; row < GridSize; row++)
+            {
+                if (solutionGrid[row, col]) count++;
+                else if (count > 0)
+                {
+                    clue += count + " ";
+                    count = 0;
+                }
+            }
+            if (count > 0) clue += count;
+            return string.IsNullOrEmpty(clue) ? "0" : clue.Trim();
+        }
+
         private async void OnMouseClick(object sender, MouseEventArgs e)
         {
             int gridStartX = ClueSize;
@@ -193,48 +236,6 @@ namespace Nonogram
                 this.Invalidate(); // Redraw the form
                 CheckWinCondition();
             }
-        }
-
-        private async Task AnimateFillCell(int row, int col)
-        {
-            int steps = 10; // Number of animation steps
-            int delay = AnimationSpeed; // Speed of animation
-
-            for (int i = 0; i <= steps; i++)
-            {
-                float scale = (float)i / steps;
-                using (Graphics g = this.CreateGraphics())
-                {
-                    int gridStartX = ClueSize;
-                    int gridStartY = ClueSize;
-                    int x = gridStartX + col * CellSize;
-                    int y = gridStartY + row * CellSize;
-
-                    g.FillRectangle(Brushes.Black, x + (CellSize * (1 - scale)) / 2,
-                                    y + (CellSize * (1 - scale)) / 2,
-                                    CellSize * scale, CellSize * scale);
-                }
-                await Task.Delay(delay);
-            }
-            playerGrid[row, col] = 1;
-            this.Invalidate(); // Finalize drawing
-        }
-
-        private void CheckWinCondition()
-        {
-            for (int row = 0; row < GridSize; row++)
-            {
-                if (GetRowClueFromPlayer(row) != GetRowClue(row))
-                    return;
-            }
-
-            for (int col = 0; col < GridSize; col++)
-            {
-                if (GetColumnClueFromPlayer(col) != GetColumnClue(col))
-                    return;
-            }
-
-            MessageBox.Show("Puzzle Solved!", "Nonogram", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private string GetRowClueFromPlayer(int row)
@@ -275,42 +276,29 @@ namespace Nonogram
             return string.IsNullOrEmpty(clue) ? "0" : clue.Trim();
         }
 
-
-
-        private string GetRowClue(int row)
+        private async Task AnimateFillCell(int row, int col)
         {
-            string clue = "";
-            int count = 0;
+            int steps = 10; // Number of animation steps
+            int delay = AnimationSpeed; // Speed of animation
 
-            for (int col = 0; col < GridSize; col++)
+            for (int i = 0; i <= steps; i++)
             {
-                if (solutionGrid[row, col]) count++;
-                else if (count > 0)
+                float scale = (float)i / steps;
+                using (Graphics g = this.CreateGraphics())
                 {
-                    clue += count + " ";
-                    count = 0;
-                }
-            }
-            if (count > 0) clue += count;
-            return string.IsNullOrEmpty(clue) ? "0" : clue.Trim();
-        }
+                    int gridStartX = ClueSize;
+                    int gridStartY = ClueSize;
+                    int x = gridStartX + col * CellSize;
+                    int y = gridStartY + row * CellSize;
 
-        private string GetColumnClue(int col)
-        {
-            string clue = "";
-            int count = 0;
-
-            for (int row = 0; row < GridSize; row++)
-            {
-                if (solutionGrid[row, col]) count++;
-                else if (count > 0)
-                {
-                    clue += count + " ";
-                    count = 0;
+                    g.FillRectangle(Brushes.Black, x + (CellSize * (1 - scale)) / 2,
+                                    y + (CellSize * (1 - scale)) / 2,
+                                    CellSize * scale, CellSize * scale);
                 }
+                await Task.Delay(delay);
             }
-            if (count > 0) clue += count;
-            return string.IsNullOrEmpty(clue) ? "0" : clue.Trim();
+            playerGrid[row, col] = 1;
+            this.Invalidate(); // Finalize drawing
         }
 
         private async Task AnimateBoardReset()
@@ -332,16 +320,21 @@ namespace Nonogram
             this.Invalidate(); // Redraw after animation
         }
 
-        private void SimulateClick(int row, int col, MouseButtons button)
+        private void CheckWinCondition()
         {
-            int gridStartX = ClueSize;
-            int gridStartY = ClueSize;
+            for (int row = 0; row < GridSize; row++)
+            {
+                if (GetRowClueFromPlayer(row) != GetRowClue(row))
+                    return;
+            }
 
-            int x = gridStartX + col * CellSize + CellSize / 2;
-            int y = gridStartY + row * CellSize + CellSize / 2;
+            for (int col = 0; col < GridSize; col++)
+            {
+                if (GetColumnClueFromPlayer(col) != GetColumnClue(col))
+                    return;
+            }
 
-            MouseEventArgs clickEvent = new MouseEventArgs(button, 1, x, y, 0);
-            OnMouseClick(this, clickEvent);
+            MessageBox.Show("Puzzle Solved!", "Nonogram", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private async void SolvePuzzle()
@@ -368,6 +361,18 @@ namespace Nonogram
             EnableUI();
         }
 
+        private void SimulateClick(int row, int col, MouseButtons button)
+        {
+            int gridStartX = ClueSize;
+            int gridStartY = ClueSize;
+
+            int x = gridStartX + col * CellSize + CellSize / 2;
+            int y = gridStartY + row * CellSize + CellSize / 2;
+
+            MouseEventArgs clickEvent = new MouseEventArgs(button, 1, x, y, 0);
+            OnMouseClick(this, clickEvent);
+        }
+
         private void DisableUI()
         {
             foreach (Control ctrl in this.Controls)
@@ -389,14 +394,6 @@ namespace Nonogram
                 }
             }
         }
-
-        private void InitializeComboBox()
-        {
-            SizeComboBox.Items.AddRange(new string[] { "5x5", "10x10", "15x15", "20x20" });
-            SizeComboBox.SelectedIndex = 2;
-            SizeComboBox.SelectedIndexChanged += SizeComboBox_SelectedIndexChanged;
-        }
-
 
         private void Form1_Load(object sender, EventArgs e)
         {
