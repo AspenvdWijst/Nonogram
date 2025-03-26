@@ -11,12 +11,13 @@ namespace Nonogram
 
     public partial class Form1 : Form
     {
-        private int CellSize = 50;
+        private int CellSize = 100;
         private int ClueSize = 100;
         private const int CluePadding = 10;
         private const int AnimationSpeed = 10;
         private int GridSize = 5;
         private Settings settings;
+        private DateTime _start;
 
         private bool[,] solutionGrid;
         private int[,] playerGrid;
@@ -31,12 +32,16 @@ namespace Nonogram
             this.SetStyle(ControlStyles.AllPaintingInWmPaint |
                           ControlStyles.UserPaint |
                           ControlStyles.OptimizedDoubleBuffer, true);
+            timer1 = new System.Windows.Forms.Timer();
+            timer1.Tick += new EventHandler(timer1_Tick);
             ComboBoxInfo();
             InitializeGrids();
         }
 
         private void InitializeGrids()
         {
+            timer1.Start();
+            _start = DateTime.Now;
             solutionGrid = GenerateRandomSolution(GridSize, GridSize);
             playerGrid = new int[GridSize, GridSize];
         }
@@ -57,14 +62,17 @@ namespace Nonogram
                 case "5x5":
                     GridSize = 5;
                     ClueSize = 100;
+                    CellSize = 100;
                     break;
                 case "10x10":
                     GridSize = 10;
                     ClueSize = 100;
+                    CellSize = 50;
                     break;
                 case "15x15":
                     GridSize = 15;
                     ClueSize = 150;
+                    CellSize = 50;
                     break;
                 case "20x20":
                     GridSize = 20;
@@ -445,6 +453,16 @@ namespace Nonogram
         }
 
         private void SizeComboBox_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            labelTime.Text = (DateTime.Now - _start).ToString(@"mm\:ss");
+        }
+
+        private void label4_Click(object sender, EventArgs e)
         {
 
         }

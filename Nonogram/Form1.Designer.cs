@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             label1 = new Label();
             label2 = new Label();
@@ -38,6 +39,8 @@
             SolveBtn = new Button();
             SizeComboBox = new ComboBox();
             label3 = new Label();
+            timer1 = new System.Windows.Forms.Timer(components);
+            labelTime = new Label();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             SuspendLayout();
@@ -129,11 +132,27 @@
             label3.TabIndex = 9;
             label3.Text = "Puzzle size";
             // 
+            // timer1
+            // 
+            timer1.Enabled = true;
+            timer1.Interval = 10;
+            // 
+            // labelTime
+            // 
+            labelTime.AutoSize = true;
+            labelTime.Location = new Point(1691, 26);
+            labelTime.Name = "labelTime";
+            labelTime.Size = new Size(49, 15);
+            labelTime.TabIndex = 10;
+            labelTime.Text = "00:00.00";
+            labelTime.Click += label4_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1904, 1041);
+            Controls.Add(labelTime);
             Controls.Add(label3);
             Controls.Add(SizeComboBox);
             Controls.Add(SolveBtn);
@@ -163,5 +182,7 @@
         private Button SolveBtn;
         private ComboBox SizeComboBox;
         private Label label3;
+        private System.Windows.Forms.Timer timer1;
+        private Label labelTime;
     }
 }
