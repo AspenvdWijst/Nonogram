@@ -11,11 +11,11 @@ namespace Nonogram
 
     public partial class Form1 : Form
     {
-        private const int CellSize = 50;
-        private const int GridSize = 5;
-        private const int ClueSize = 100;
+        private int CellSize = 50;
+        private int ClueSize = 100;
         private const int CluePadding = 10;
         private const int AnimationSpeed = 10;
+        private int GridSize = 5;
         private Settings settings;
 
         private bool[,] solutionGrid;
@@ -27,11 +27,11 @@ namespace Nonogram
             settings = Settings.Load();
             this.Paint += new PaintEventHandler(this.OnPaint);
             this.MouseClick += new MouseEventHandler(this.OnMouseClick);
-            this.Size = new Size(600, 600);
+            this.Size = new Size(1920, 1080);
             this.SetStyle(ControlStyles.AllPaintingInWmPaint |
                           ControlStyles.UserPaint |
                           ControlStyles.OptimizedDoubleBuffer, true);
-
+            InitializeComboBox();
             InitializeGrids();
         }
 
@@ -39,6 +39,35 @@ namespace Nonogram
         {
             solutionGrid = GenerateRandomSolution(GridSize, GridSize);
             playerGrid = new int[GridSize, GridSize];
+        }
+
+        private void SizeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string selectedSize = SizeComboBox.SelectedItem.ToString();
+
+            switch (selectedSize)
+            {
+                case "5x5":
+                    GridSize = 5;
+                    ClueSize = 100;
+                    break;
+                case "10x10":
+                    GridSize = 10;
+                    ClueSize = 100;
+                    break;
+                case "15x15":
+                    GridSize = 15;
+                    ClueSize = 150;
+                    break;
+                case "20x20":
+                    GridSize = 20;
+                    ClueSize = 175;
+                    CellSize = 40;
+                    break;
+            }
+
+            InitializeGrids(); // Reset grid data
+            this.Invalidate(); // Repaint the form
         }
 
         private bool[,] GenerateRandomSolution(int rows, int cols)
@@ -191,28 +220,61 @@ namespace Nonogram
             this.Invalidate(); // Finalize drawing
         }
 
-        private async void CheckWinCondition()
+        private void CheckWinCondition()
         {
-            bool isSolved = await Task.Run(() =>
+            for (int row = 0; row < GridSize; row++)
             {
-                for (int row = 0; row < GridSize; row++)
-                {
-                    for (int col = 0; col < GridSize; col++)
-                    {
-                        if ((playerGrid[row, col] == 1) != solutionGrid[row, col])
-                        {
-                            return false; // Puzzle not solved yet
-                        }
-                    }
-                }
-                return true;
-            });
-
-            if (isSolved)
-            {
-                MessageBox.Show("Puzzle Solved!", "Nonogram", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (GetRowClueFromPlayer(row) != GetRowClue(row))
+                    return;
             }
+
+            for (int col = 0; col < GridSize; col++)
+            {
+                if (GetColumnClueFromPlayer(col) != GetColumnClue(col))
+                    return;
+            }
+
+            MessageBox.Show("Puzzle Solved!", "Nonogram", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+
+        private string GetRowClueFromPlayer(int row)
+        {
+            string clue = "";
+            int count = 0;
+
+            for (int col = 0; col < GridSize; col++)
+            {
+                if (playerGrid[row, col] == 1) count++;
+                else if (count > 0)
+                {
+                    clue += count + " ";
+                    count = 0;
+                }
+            }
+            if (count > 0) clue += count;
+
+            return string.IsNullOrEmpty(clue) ? "0" : clue.Trim();
+        }
+
+        private string GetColumnClueFromPlayer(int col)
+        {
+            string clue = "";
+            int count = 0;
+
+            for (int row = 0; row < GridSize; row++)
+            {
+                if (playerGrid[row, col] == 1) count++;
+                else if (count > 0)
+                {
+                    clue += count + " ";
+                    count = 0;
+                }
+            }
+            if (count > 0) clue += count;
+
+            return string.IsNullOrEmpty(clue) ? "0" : clue.Trim();
+        }
+
 
 
         private string GetRowClue(int row)
@@ -310,7 +372,7 @@ namespace Nonogram
         {
             foreach (Control ctrl in this.Controls)
             {
-                if (ctrl is Button || ctrl is Panel)
+                if (ctrl is Button || ctrl is Panel || ctrl is ComboBox)
                 {
                     ctrl.Enabled = false;
                 }
@@ -326,6 +388,13 @@ namespace Nonogram
                     ctrl.Enabled = true;
                 }
             }
+        }
+
+        private void InitializeComboBox()
+        {
+            SizeComboBox.Items.AddRange(new string[] { "5x5", "10x10", "15x15", "20x20" });
+            SizeComboBox.SelectedIndex = 2;
+            SizeComboBox.SelectedIndexChanged += SizeComboBox_SelectedIndexChanged;
         }
 
 
@@ -366,7 +435,12 @@ namespace Nonogram
         {
             ResetButton.Enabled = false;
             NewPuzzleBtn.Enabled = false;
-            SolvePuzzle();  
+            SolvePuzzle();
+        }
+
+        private void SizeComboBox_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+
         }
     }
 }
