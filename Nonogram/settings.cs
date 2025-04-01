@@ -9,12 +9,13 @@ public class Settings
     {
         try
         {
-            string json = File.ReadAllText("settings.json");
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");
+            string json = File.ReadAllText(filePath);
             return JsonConvert.DeserializeObject<Settings>(json);
         }
         catch
         {
-            return new Settings { animationsEnabled = true }; // Default if file missing
+            return new Settings { animationsEnabled = false }; // Default if file missing
         }
     }
 }

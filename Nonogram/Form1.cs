@@ -2,12 +2,13 @@ namespace Nonogram
 {
     using System;
     using System.IO;
-    using Newtonsoft.Json;
+    using System.Text.Json;
+    //using Newtonsoft.Json;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Drawing;
     using System.Windows.Forms;
-
+    using Newtonsoft.Json;
 
     public partial class Form1 : Form
     {
@@ -25,6 +26,7 @@ namespace Nonogram
         public Form1()
         {
             InitializeComponent();
+            SaveGrid();
             settings = Settings.Load();
             this.Paint += new PaintEventHandler(this.OnPaint);
             this.MouseClick += new MouseEventHandler(this.OnMouseClick);
@@ -241,6 +243,7 @@ namespace Nonogram
                     playerGrid[row, col] = (playerGrid[row, col] == 2) ? 0 : 2;
                 }
 
+                SaveGrid();
                 this.Invalidate(); // Redraw the form
                 CheckWinCondition();
             }
@@ -402,6 +405,32 @@ namespace Nonogram
                 }
             }
         }
+
+        private T[][] ConvertToJaggedArray<T>(T[,] twoDArray)
+        {
+            int rows = twoDArray.GetLength(0);
+            int cols = twoDArray.GetLength(1);
+
+            T[][] jaggedArray = new T[rows][];
+            for (int i = 0; i < rows; i++)
+            {
+                jaggedArray[i] = new T[cols];
+                for (int j = 0; j < cols; j++)
+                {
+                    jaggedArray[i][j] = twoDArray[i, j];
+                }
+            }
+            return jaggedArray;
+        }
+
+        private async Task SaveGrid()
+        {
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\SavedGrid.json");
+            int[][] jaggedGrid = ConvertToJaggedArray(playerGrid);
+            string jsonGrid = System.Text.Json.JsonSerializer.Serialize(jaggedGrid);
+            await File.WriteAllTextAsync(filePath, jsonGrid);
+        }
+
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             var result = MessageBox.Show("Are you sure you want to exit? Unsaved progress will be lost", "Exit Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
