@@ -18,4 +18,11 @@ public class Settings
             return new Settings { animationsEnabled = false }; // Default if file missing
         }
     }
+
+    public void Save()
+    {
+        string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");
+        string json = JsonConvert.SerializeObject(this, Formatting.Indented);
+        File.WriteAllText(filePath, json);
+    }
 }

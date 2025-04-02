@@ -349,6 +349,39 @@ namespace Nonogram
             return true;
         }
 
+        private void OpenSettingsWindow()
+        {
+            Form settingsForm = new Form()
+            {
+                Text = "Settings",
+                Size = new Size(300, 200),
+                StartPosition = FormStartPosition.CenterParent
+            };
+
+            CheckBox animationCheckBox = new CheckBox()
+            {
+                Text = "Enable Animations",
+                Checked = settings.animationsEnabled,
+                Location = new Point(50, 50)
+            };
+
+            Button saveButton = new Button()
+            {
+                Text = "Save",
+                Location = new Point(50, 100)
+            };
+            saveButton.Click += (sender, e) =>
+            {
+                settings.animationsEnabled = animationCheckBox.Checked;
+                settings.Save();
+                settingsForm.Close();
+            };
+
+            settingsForm.Controls.Add(animationCheckBox);
+            settingsForm.Controls.Add(saveButton);
+            settingsForm.ShowDialog();
+        }
+
         private async void GiveHint()
         {
             Random rand = new Random();
@@ -537,6 +570,11 @@ namespace Nonogram
         private void button1_Click(object sender, EventArgs e)
         {
             GiveHint();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            OpenSettingsWindow();
         }
     }
 }
