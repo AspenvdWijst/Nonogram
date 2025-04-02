@@ -331,21 +331,51 @@ namespace Nonogram
             this.Invalidate(); // Redraw after animation
         }
 
-        private void CheckWinCondition()
+        private bool CheckWinCondition()
         {
             for (int row = 0; row < GridSize; row++)
             {
                 if (GetRowClueFromPlayer(row) != GetRowClue(row))
-                    return;
+                    return false;
             }
 
             for (int col = 0; col < GridSize; col++)
             {
                 if (GetColumnClueFromPlayer(col) != GetColumnClue(col))
-                    return;
+                    return false;
             }
 
             MessageBox.Show("Puzzle Solved!", "Nonogram", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return true;
+        }
+
+        private async void GiveHint()
+        {
+            Random rand = new Random();
+            List<(int, int)> possibleHints = new List<(int, int)>();
+
+            for (int row = 0; row < GridSize; row++)
+            {
+                for (int col = 0; col < GridSize; col++)
+                {
+                    if (playerGrid[row, col] != (solutionGrid[row, col] ? 1 : 2))
+                    {
+                        possibleHints.Add((row, col));
+                    }
+                }
+            }
+
+            if (possibleHints.Count > 0)
+            {
+                var (hintRow, hintCol) = possibleHints[rand.Next(possibleHints.Count)];
+                playerGrid[hintRow, hintCol] = solutionGrid[hintRow, hintCol] ? 1 : 2;
+                this.Invalidate();
+                await Task.Delay(500); // Prevents hint spam
+            }
+            else
+            {
+                MessageBox.Show("No hints available, the puzzle is almost complete!", "Hint", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         private async void SolvePuzzle()
@@ -355,6 +385,12 @@ namespace Nonogram
             {
                 for (int col = 0; col < GridSize; col++)
                 {
+                    if (CheckWinCondition())
+                    {
+                        EnableUI();
+                        return;
+                    }
+
                     bool shouldBeFilled = solutionGrid[row, col];
 
                     if (shouldBeFilled && playerGrid[row, col] != 1)
@@ -393,6 +429,7 @@ namespace Nonogram
                     ctrl.Enabled = false;
                 }
             }
+            this.MouseClick -= OnMouseClick; // Prevents user from editing cells
         }
 
         private void EnableUI()
@@ -404,6 +441,7 @@ namespace Nonogram
                     ctrl.Enabled = true;
                 }
             }
+            this.MouseClick += OnMouseClick;
         }
 
         private T[][] ConvertToJaggedArray<T>(T[,] twoDArray)
@@ -494,6 +532,11 @@ namespace Nonogram
         private void label4_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            GiveHint();
         }
     }
 }
