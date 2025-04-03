@@ -11,6 +11,7 @@ namespace Nonogram
 
     public partial class Form1 : Form
     {
+        private bool PlayerSolved = true;
         private int CellSize = 50;
         private int ClueSize = 100;
         private const int CluePadding = 10;
@@ -20,6 +21,8 @@ namespace Nonogram
 
         private bool[,] solutionGrid;
         private int[,] playerGrid;
+        private int solvedPuzzlesCount = 0;
+        private Label solvedPuzzlesLabel;
 
         public Form1()
         {
@@ -33,6 +36,25 @@ namespace Nonogram
                           ControlStyles.OptimizedDoubleBuffer, true);
             ComboBoxInfo();
             InitializeGrids();
+            InitializeSolvedPuzzlesLabel();
+        }
+
+        private void InitializeSolvedPuzzlesLabel()
+        {
+            solvedPuzzlesLabel = new Label();
+            solvedPuzzlesLabel.Text = $"Puzzles Solved: {solvedPuzzlesCount}";
+            solvedPuzzlesLabel.Font = new Font("Arial", 14, FontStyle.Bold);
+            solvedPuzzlesLabel.Location = new Point(900, 20);
+            solvedPuzzlesLabel.AutoSize = true;
+            this.Controls.Add(solvedPuzzlesLabel);
+        }
+
+        private void UpdateSolvedPuzzlesLabel()
+        {
+            if (solvedPuzzlesLabel != null)
+            {
+                solvedPuzzlesLabel.Text = $"Puzzles Solved: {solvedPuzzlesCount}";
+            }
         }
 
         private void InitializeGrids()
@@ -320,7 +342,7 @@ namespace Nonogram
             this.Invalidate(); // Redraw after animation
         }
 
-        private void CheckWinCondition()
+        private void CheckWinCondition(bool isManual = true) // Default is manual
         {
             for (int row = 0; row < GridSize; row++)
             {
@@ -334,12 +356,19 @@ namespace Nonogram
                     return;
             }
 
+            if (PlayerSolved == true)
+            {
+                solvedPuzzlesCount++;
+                UpdateSolvedPuzzlesLabel();
+            }
             MessageBox.Show("Puzzle Solved!", "Nonogram", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+
 
         private async void SolvePuzzle()
         {
             DisableUI();
+            PlayerSolved = false;
             for (int row = 0; row < GridSize; row++)
             {
                 for (int col = 0; col < GridSize; col++)
@@ -360,6 +389,7 @@ namespace Nonogram
             }
             EnableUI();
         }
+
 
         private void SimulateClick(int row, int col, MouseButtons button)
         {
@@ -445,6 +475,11 @@ namespace Nonogram
         }
 
         private void SizeComboBox_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void solvedPuzzlesLabel_Click(object sender, EventArgs e)
         {
 
         }
