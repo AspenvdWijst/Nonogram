@@ -3,7 +3,6 @@ namespace Nonogram
     using System;
     using System.IO;
     using System.Text.Json;
-    //using Newtonsoft.Json;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Drawing;
@@ -12,6 +11,7 @@ namespace Nonogram
 
     public partial class Form1 : Form
     {
+        //All sizes of the grid and animationspeed
         private int CellSize = 100;
         private int ClueSize = 100;
         private const int CluePadding = 10;
@@ -20,14 +20,14 @@ namespace Nonogram
         private Settings settings;
         private DateTime _start;
 
+        //Variables for the different grids
         private bool[,] solutionGrid;
         private int[,] playerGrid;
 
         public Form1()
         {
             InitializeComponent();
-            SaveGrid();
-            settings = Settings.Load();
+            settings = Settings.Load();//load in the settings of the user
             this.Paint += new PaintEventHandler(this.OnPaint);
             this.MouseClick += new MouseEventHandler(this.OnMouseClick);
             this.Size = new Size(1920, 1080);
@@ -36,16 +36,16 @@ namespace Nonogram
                           ControlStyles.OptimizedDoubleBuffer, true);
             timer1 = new System.Windows.Forms.Timer();
             timer1.Tick += new EventHandler(timer1_Tick);
-            ComboBoxInfo();
-            InitializeGrids();
+            ComboBoxInfo();//Initialize the combobox with its options and functions
+            InitializeGrids();//Start drawing the grid
         }
 
         private void InitializeGrids()
         {
             timer1.Start();
             _start = DateTime.Now;
-            solutionGrid = GenerateRandomSolution(GridSize, GridSize);
-            playerGrid = new int[GridSize, GridSize];
+            solutionGrid = GenerateRandomSolution(GridSize, GridSize);//Generate a random solution based on gridsize
+            playerGrid = new int[GridSize, GridSize];//Create a new playergrid, this will become important later in the code
         }
 
         private void ComboBoxInfo()
