@@ -360,9 +360,10 @@ namespace Nonogram
 
             CheckBox animationCheckBox = new CheckBox()
             {
-                Text = "Enable Animations",
+                Text = "Enable/disable Animations",
                 Checked = settings.animationsEnabled,
-                Location = new Point(50, 50)
+                Location = new Point(50, 50),
+                AutoSize = true
             };
 
             Button saveButton = new Button()
@@ -575,6 +576,11 @@ namespace Nonogram
         private void button2_Click(object sender, EventArgs e)
         {
             OpenSettingsWindow();
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

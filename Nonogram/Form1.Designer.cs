@@ -49,6 +49,7 @@
             // 
             // label1
             // 
+            label1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 12F);
             label1.Location = new Point(1691, 109);
@@ -60,6 +61,7 @@
             // 
             // label2
             // 
+            label2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label2.Location = new Point(1691, 165);
@@ -70,6 +72,7 @@
             // 
             // pictureBox1
             // 
+            pictureBox1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
             pictureBox1.Location = new Point(1797, 156);
             pictureBox1.Name = "pictureBox1";
@@ -79,6 +82,7 @@
             // 
             // pictureBox2
             // 
+            pictureBox2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             pictureBox2.Image = (Image)resources.GetObject("pictureBox2.Image");
             pictureBox2.Location = new Point(1797, 100);
             pictureBox2.Name = "pictureBox2";
@@ -88,6 +92,7 @@
             // 
             // ResetButton
             // 
+            ResetButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             ResetButton.Location = new Point(1716, 222);
             ResetButton.Name = "ResetButton";
             ResetButton.Size = new Size(75, 72);
@@ -98,6 +103,7 @@
             // 
             // NewPuzzleBtn
             // 
+            NewPuzzleBtn.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             NewPuzzleBtn.Location = new Point(1716, 316);
             NewPuzzleBtn.Name = "NewPuzzleBtn";
             NewPuzzleBtn.Size = new Size(75, 71);
@@ -108,6 +114,7 @@
             // 
             // SolveBtn
             // 
+            SolveBtn.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             SolveBtn.Location = new Point(1716, 496);
             SolveBtn.Name = "SolveBtn";
             SolveBtn.Size = new Size(75, 69);
@@ -118,6 +125,7 @@
             // 
             // SizeComboBox
             // 
+            SizeComboBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             SizeComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             SizeComboBox.FormattingEnabled = true;
             SizeComboBox.Location = new Point(1691, 59);
@@ -127,12 +135,14 @@
             // 
             // label3
             // 
+            label3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label3.AutoSize = true;
             label3.Location = new Point(1691, 41);
             label3.Name = "label3";
             label3.Size = new Size(62, 15);
             label3.TabIndex = 9;
             label3.Text = "Puzzle size";
+            label3.Click += label3_Click;
             // 
             // timer1
             // 
@@ -141,6 +151,7 @@
             // 
             // labelTime
             // 
+            labelTime.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             labelTime.AutoSize = true;
             labelTime.Location = new Point(1691, 26);
             labelTime.Name = "labelTime";
@@ -151,6 +162,7 @@
             // 
             // button1
             // 
+            button1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             button1.Location = new Point(1716, 410);
             button1.Name = "button1";
             button1.Size = new Size(75, 69);
@@ -161,11 +173,12 @@
             // 
             // button2
             // 
+            button2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             button2.Location = new Point(1716, 589);
             button2.Name = "button2";
             button2.Size = new Size(75, 69);
             button2.TabIndex = 12;
-            button2.Text = "Settings test";
+            button2.Text = "Settings";
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
             // 
@@ -177,11 +190,11 @@
             Controls.Add(button2);
             Controls.Add(button1);
             Controls.Add(labelTime);
-            Controls.Add(label3);
             Controls.Add(SizeComboBox);
             Controls.Add(SolveBtn);
             Controls.Add(NewPuzzleBtn);
             Controls.Add(ResetButton);
+            Controls.Add(label3);
             Controls.Add(pictureBox2);
             Controls.Add(pictureBox1);
             Controls.Add(label2);
