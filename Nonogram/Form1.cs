@@ -10,8 +10,8 @@ namespace Nonogram
     using System.Windows.Forms;
     using Newtonsoft.Json;
 
-    public partial class Form1 : Form
-    {
+        public partial class Form1 : Form
+        {
         private int CellSize = 100;
         private int ClueSize = 100;
         private const int CluePadding = 10;
@@ -23,9 +23,14 @@ namespace Nonogram
         private bool[,] solutionGrid;
         private int[,] playerGrid;
 
-        public Form1()
+        public Form1(int gridSize)
         {
             InitializeComponent();
+            this.GridSize = gridSize;
+            this.CellSize = (gridSize <= 10) ? 100 : (gridSize <= 15) ? 50 : 40;
+            this.ClueSize = this.CellSize * (gridSize >= 15 ? 4 : 1); // Adjust clue size dynamically
+            InitializeGrids();
+            this.Invalidate(); // Redraw
             SaveGrid();
             settings = Settings.Load();
             this.Paint += new PaintEventHandler(this.OnPaint);
