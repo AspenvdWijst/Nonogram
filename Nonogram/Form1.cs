@@ -24,9 +24,13 @@ namespace Nonogram
         private bool[,] solutionGrid;
         private int[,] playerGrid;
 
+        private bool PlayerSolved = false;
+        private int solvedPuzzlesCount = 0;
+        private Label solvedPuzzlesLabel;
         public Form1()
         {
             InitializeComponent();
+            InitializeSolvedPuzzlesLabel();
             settings = Settings.Load();//load in the settings of the user
             this.Paint += new PaintEventHandler(this.OnPaint);
             this.MouseClick += new MouseEventHandler(this.OnMouseClick);
@@ -46,6 +50,23 @@ namespace Nonogram
             _start = DateTime.Now;
             solutionGrid = GenerateRandomSolution(GridSize, GridSize);//Generate a random solution based on gridsize
             playerGrid = new int[GridSize, GridSize];//Create a new playergrid, this will become important later in the code
+        }
+        private void InitializeSolvedPuzzlesLabel()
+        {
+            solvedPuzzlesLabel = new Label();
+            solvedPuzzlesLabel.Text = $"Puzzles Solved: {solvedPuzzlesCount}";
+            solvedPuzzlesLabel.Font = new Font("Arial", 14, FontStyle.Bold);
+            solvedPuzzlesLabel.Location = new Point(900, 20);
+            solvedPuzzlesLabel.AutoSize = true;
+            this.Controls.Add(solvedPuzzlesLabel);
+        }
+
+        private void UpdateSolvedPuzzlesLabel()
+        {
+            if (solvedPuzzlesLabel != null)
+            {
+                solvedPuzzlesLabel.Text = $"Puzzles Solved: {solvedPuzzlesCount}";
+            }
         }
 
         private void ComboBoxInfo()
@@ -333,6 +354,7 @@ namespace Nonogram
 
         private bool CheckWinCondition()
         {
+            // Check if the player grid matches the solution grid
             for (int row = 0; row < GridSize; row++)
             {
                 if (GetRowClueFromPlayer(row) != GetRowClue(row))
@@ -345,9 +367,16 @@ namespace Nonogram
                     return false;
             }
 
+            if (PlayerSolved == true)
+            {
+                solvedPuzzlesCount++;
+                UpdateSolvedPuzzlesLabel();
+            }
             MessageBox.Show("Puzzle Solved!", "Nonogram", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            return true;
+
+            return true; // Puzzle solved
         }
+
 
         private void OpenSettingsWindow()
         {
@@ -415,6 +444,7 @@ namespace Nonogram
         private async void SolvePuzzle()
         {
             DisableUI();
+            PlayerSolved = false;
             for (int row = 0; row < GridSize; row++)
             {
                 for (int col = 0; col < GridSize; col++)
@@ -525,6 +555,8 @@ namespace Nonogram
 
         private async void ResetButton_Click(object sender, EventArgs e)
         {
+            PlayerSolved = true;
+
             if (settings.animationsEnabled)
             {
                 await AnimateBoardReset();
@@ -538,6 +570,8 @@ namespace Nonogram
 
         private async void NewPuzzleBtn_Click(object sender, EventArgs e)
         {
+            PlayerSolved = true;
+
             await Task.Run(() =>
             {
                 InitializeGrids();
