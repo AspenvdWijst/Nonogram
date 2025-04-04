@@ -1,5 +1,5 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using Newtonsoft.Json;
+using static Nonogram.Form1;
 
 namespace Nonogram
 {
@@ -13,6 +13,15 @@ namespace Nonogram
             this.Text = "Nonogram - Main Menu";
             this.Size = new System.Drawing.Size(300, 200);
             this.StartPosition = FormStartPosition.CenterScreen;
+            
+            Button loadButton = new Button
+            {
+                Text = "Load Game",
+                Size = new Size(200, 50),
+                Location = new Point(50, 150)
+            };
+            loadButton.Click += LoadButton_Click;
+            Controls.Add(loadButton);
 
             Label titleLabel = new Label()
             {
@@ -59,5 +68,45 @@ namespace Nonogram
             this.Close();
         }
 
+        private void LoadButton_Click(object sender, EventArgs e)
+        {
+
+            // Load saved game data and grid size from the file
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\SavedGrid.json");
+
+            if (File.Exists(filePath))
+            {
+                string savedData = File.ReadAllText(filePath);
+                int[][] jaggedPlayerGrid = JsonConvert.DeserializeObject<int[][]>(savedData);
+
+                // Convert jagged array to multidimensional array
+                int[,] playerGrid = ConvertJaggedToMultidimensionalArray(jaggedPlayerGrid);
+
+                // Pass the converted player grid to Form1
+                Form1 gameForm = new Form1(5, playerGrid);  // Use your default grid size or saved one
+                gameForm.Show();
+                this.Hide();
+            }
+            else
+            {
+                MessageBox.Show("No saved game found!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private int[,] ConvertJaggedToMultidimensionalArray(int[][] jaggedArray)
+        {
+            int rows = jaggedArray.Length;
+            int cols = jaggedArray[0].Length;
+            int[,] multiArray = new int[rows, cols];
+                
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    multiArray[i, j] = jaggedArray[i][j];
+                }
+            }
+
+            return multiArray;
+        }
     }
 }

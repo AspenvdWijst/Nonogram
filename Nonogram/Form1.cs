@@ -10,8 +10,8 @@ namespace Nonogram
     using System.Windows.Forms;
     using Newtonsoft.Json;
 
-        public partial class Form1 : Form
-        {
+    public partial class Form1 : Form
+    {
         private int CellSize = 100;
         private int ClueSize = 100;
         private const int CluePadding = 10;
@@ -23,15 +23,14 @@ namespace Nonogram
         private bool[,] solutionGrid;
         private int[,] playerGrid;
 
-        public Form1(int gridSize)
+        public Form1(int gridSize, int[,] savedPlayerGrid = null)
         {
             InitializeComponent();
             this.GridSize = gridSize;
             this.CellSize = (gridSize <= 10) ? 100 : (gridSize <= 15) ? 50 : 40;
             this.ClueSize = this.CellSize * (gridSize >= 15 ? 4 : 1); // Adjust clue size dynamically
-            InitializeGrids();
+            InitializeGrids(savedPlayerGrid); // Initialize grids with saved data if available
             this.Invalidate(); // Redraw
-            SaveGrid();
             settings = Settings.Load();
             this.Paint += new PaintEventHandler(this.OnPaint);
             this.MouseClick += new MouseEventHandler(this.OnMouseClick);
@@ -42,15 +41,31 @@ namespace Nonogram
             timer1 = new System.Windows.Forms.Timer();
             timer1.Tick += new EventHandler(timer1_Tick);
             ComboBoxInfo();
-            InitializeGrids();
         }
 
-        private void InitializeGrids()
+        private void InitializeGrids(int[,] savedPlayerGrid = null)
         {
             timer1.Start();
             _start = DateTime.Now;
             solutionGrid = GenerateRandomSolution(GridSize, GridSize);
-            playerGrid = new int[GridSize, GridSize];
+
+            if (savedPlayerGrid != null)
+            {
+                // Use the saved player grid if available
+                playerGrid = savedPlayerGrid;
+            }
+            else
+            {
+                // Initialize a new empty player grid
+                playerGrid = new int[GridSize, GridSize];
+            }
+        }
+
+        public class SaveData
+        {
+            public int GridSize { get; set; }
+            public bool[,] PlayerGrid { get; set; }  // What the player has filled in
+            public int[,] SolutionGrid { get; set; } // The actual solution
         }
 
         private void ComboBoxInfo()
@@ -506,7 +521,22 @@ namespace Nonogram
             string jsonGrid = System.Text.Json.JsonSerializer.Serialize(jaggedGrid);
             await File.WriteAllTextAsync(filePath, jsonGrid);
         }
+        private int[][] ConvertToJaggedArray(int[,] twoDArray)
+        {
+            int rows = twoDArray.GetLength(0);
+            int cols = twoDArray.GetLength(1);
 
+            int[][] jaggedArray = new int[rows][];
+            for (int i = 0; i < rows; i++)
+            {
+                jaggedArray[i] = new int[cols];
+                for (int j = 0; j < cols; j++)
+                {
+                    jaggedArray[i][j] = twoDArray[i, j];
+                }
+            }
+            return jaggedArray;
+        }
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             var result = MessageBox.Show("Are you sure you want to exit? Unsaved progress will be lost", "Exit Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -581,5 +611,17 @@ namespace Nonogram
         {
             OpenSettingsWindow();
         }
+
+
+        public static class GameSettings
+        {
+            private static string settingsFilePath = "settings.txt";
+
+            public static void SaveGridSize(int gridSize)
+            {
+                File.WriteAllText(settingsFilePath, gridSize.ToString());
+            }
+        }
+
     }
 }
