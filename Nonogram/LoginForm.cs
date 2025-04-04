@@ -10,10 +10,11 @@ namespace Nonogram
     public partial class LoginForm : Form
     {
         private string filePath = "users.json"; // Path to user database json file
-
+        private Settings settings;
         public LoginForm()
         {
             InitializeComponent();
+            settings = Settings.Load();
             this.Load += new EventHandler(LoginForm_Load);
         }
 
@@ -27,6 +28,7 @@ namespace Nonogram
             // Saves entered text from the textboxes
             string username = txtUsername.Text.Trim();
             string password = txtPassword.Text.Trim();
+            int SolvedCount = 0;
 
             // Check if the textboxes are empty
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
@@ -46,7 +48,7 @@ namespace Nonogram
             }
 
             // Add the new user to the list
-            users.Add(new User { Username = username, Password = HashPassword(password) });
+            users.Add(new User { Username = username, Password = HashPassword(password), SolvedCount = SolvedCount });
 
             SaveUsers(users);
             MessageBox.Show("Registration complete!");
@@ -61,15 +63,19 @@ namespace Nonogram
 
             List<User> users = LoadUsers();
 
-            // Debugging: Show loaded users
-            // MessageBox.Show($"Loaded Users:\n" + JsonConvert.SerializeObject(users, Formatting.Indented));
-
             // Find the user with the entered username and password
             User user = users.Find(u => u.Username == username && u.Password == hashedPassword);
 
             if (user != null) // If the user is found
             {
                 MessageBox.Show("Login successful!");
+
+                // Fetch the SolvedCount for this user
+                int solvedCount = user.SolvedCount;
+
+                // You can display or use the solvedCount
+                MessageBox.Show($"Welcome {username}! Puzzles solved: {solvedCount}");
+
                 this.Hide();
                 Form1 mainForm = new Form1();
                 mainForm.Show();
@@ -79,6 +85,8 @@ namespace Nonogram
                 MessageBox.Show("Invalid credentials!\n\nEntered Username: " + username + "\nEntered Password (hashed): " + hashedPassword);
             }
         }
+
+
 
 
         private List<User> LoadUsers()
@@ -122,6 +130,7 @@ namespace Nonogram
         {
             public string Username { get; set; }
             public string Password { get; set; }
+            public int SolvedCount { get; set; }
         }
     }
 }

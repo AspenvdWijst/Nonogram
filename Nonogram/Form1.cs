@@ -11,6 +11,7 @@ namespace Nonogram
 
     public partial class Form1 : Form
     {
+        private string filePath = "users.json"; // Path to user database json file
         private bool PlayerSolved = true;
         private int CellSize = 50;
         private int ClueSize = 100;
@@ -342,7 +343,7 @@ namespace Nonogram
             this.Invalidate(); // Redraw after animation
         }
 
-        private void CheckWinCondition(bool isManual = true) // Default is manual
+        private void CheckWinCondition(bool isManual = true)
         {
             for (int row = 0; row < GridSize; row++)
             {
@@ -360,6 +361,9 @@ namespace Nonogram
             {
                 solvedPuzzlesCount++;
                 UpdateSolvedPuzzlesLabel();
+
+                // Increment the solved puzzles count in the settings and save to JSON
+                settings.IncrementSolvedPuzzlesCount();
             }
             MessageBox.Show("Puzzle Solved!", "Nonogram", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -446,6 +450,8 @@ namespace Nonogram
 
         private async void ResetButton_Click(object sender, EventArgs e)
         {
+            PlayerSolved = true;
+
             if (settings.animationsEnabled)
             {
                 await AnimateBoardReset();
@@ -457,8 +463,39 @@ namespace Nonogram
             }
         }
 
+        private List<LoginForm.User> LoadUsers()
+        {
+            // If the file doesn't exist, create it
+            if (!File.Exists(filePath))
+            {
+                File.WriteAllText(filePath, "[]");
+                return new List<LoginForm.User>();
+            }
+
+            // Load the users from the json file
+            try
+            {
+                string json = File.ReadAllText(filePath);
+                return JsonConvert.DeserializeObject<List<LoginForm.User>>(json) ?? new List<LoginForm.User>();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error reading user database: " + ex.Message);
+                return new List<LoginForm.User>();
+            }
+        }
+
+        private void SaveUsers(List<LoginForm.User> users)
+        {
+            string json = JsonConvert.SerializeObject(users, Formatting.Indented);
+            File.WriteAllText(filePath, json); // Save the users to the json file
+        }
+
+
         private async void NewPuzzleBtn_Click(object sender, EventArgs e)
         {
+            PlayerSolved = true;
+
             await Task.Run(() =>
             {
                 InitializeGrids();

@@ -41,29 +41,26 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(275, 119);
-            label1.Margin = new Padding(2, 0, 2, 0);
+            label1.Location = new Point(472, 238);
             label1.Name = "label1";
-            label1.Size = new Size(63, 15);
+            label1.Size = new Size(111, 30);
             label1.TabIndex = 0;
             label1.Text = "Username:";
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(275, 144);
-            label2.Margin = new Padding(2, 0, 2, 0);
+            label2.Location = new Point(472, 289);
             label2.Name = "label2";
-            label2.Size = new Size(60, 15);
+            label2.Size = new Size(104, 30);
             label2.TabIndex = 1;
             label2.Text = "Password:";
             // 
             // btnLogin
             // 
-            btnLogin.Location = new Point(376, 176);
-            btnLogin.Margin = new Padding(2);
+            btnLogin.Location = new Point(645, 351);
             btnLogin.Name = "btnLogin";
-            btnLogin.Size = new Size(76, 26);
+            btnLogin.Size = new Size(131, 52);
             btnLogin.TabIndex = 2;
             btnLogin.Text = "Login";
             btnLogin.UseVisualStyleBackColor = true;
@@ -71,10 +68,9 @@
             // 
             // btnRegister
             // 
-            btnRegister.Location = new Point(275, 176);
-            btnRegister.Margin = new Padding(2);
+            btnRegister.Location = new Point(472, 351);
             btnRegister.Name = "btnRegister";
-            btnRegister.Size = new Size(76, 26);
+            btnRegister.Size = new Size(131, 52);
             btnRegister.TabIndex = 3;
             btnRegister.Text = "Register";
             btnRegister.UseVisualStyleBackColor = true;
@@ -82,29 +78,25 @@
             // 
             // txtUsername
             // 
-            txtUsername.Location = new Point(351, 119);
-            txtUsername.Margin = new Padding(2);
+            txtUsername.Location = new Point(601, 238);
             txtUsername.Name = "txtUsername";
-            txtUsername.Size = new Size(104, 23);
+            txtUsername.Size = new Size(175, 35);
             txtUsername.TabIndex = 4;
             // 
             // txtPassword
             // 
-            txtPassword.Location = new Point(351, 144);
-            txtPassword.Margin = new Padding(2);
+            txtPassword.Location = new Point(601, 289);
             txtPassword.Name = "txtPassword";
-            txtPassword.Size = new Size(104, 23);
+            txtPassword.Size = new Size(175, 35);
             txtPassword.TabIndex = 5;
-            txtPassword.UseSystemPasswordChar = true;
             // 
             // label3
             // 
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 20.1428585F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label3.Location = new Point(285, 34);
-            label3.Margin = new Padding(2, 0, 2, 0);
+            label3.Location = new Point(489, 69);
             label3.Name = "label3";
-            label3.Size = new Size(156, 37);
+            label3.Size = new Size(272, 65);
             label3.TabIndex = 6;
             label3.Text = "Nonogram";
             // 
@@ -112,18 +104,17 @@
             // 
             label4.AutoSize = true;
             label4.Font = new Font("Segoe UI", 11.1428576F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label4.Location = new Point(311, 71);
-            label4.Margin = new Padding(2, 0, 2, 0);
+            label4.Location = new Point(579, 147);
             label4.Name = "label4";
-            label4.Size = new Size(106, 20);
+            label4.Size = new Size(84, 37);
             label4.TabIndex = 7;
-            label4.Text = "Login/Register";
+            label4.Text = "Login";
             // 
             // LoginForm
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(12F, 30F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(745, 336);
+            ClientSize = new Size(1277, 673);
             Controls.Add(label4);
             Controls.Add(label3);
             Controls.Add(txtPassword);
@@ -132,7 +123,6 @@
             Controls.Add(btnLogin);
             Controls.Add(label2);
             Controls.Add(label1);
-            Margin = new Padding(2);
             Name = "LoginForm";
             Text = "LoginForm";
             Load += LoginForm_Load;
