@@ -41,7 +41,30 @@ namespace Nonogram
             timer1 = new System.Windows.Forms.Timer();
             timer1.Tick += new EventHandler(timer1_Tick);
             ComboBoxInfo();
+            this.FormClosed += (s, e) => Application.Exit();
+
+            //home button
+            Button backButton = new Button
+            {
+                Text = "Back to Main Menu",
+                Location = new Point(1700, 900), // bottomright
+                AutoSize = true
+            };
+            backButton.Click += BackButton_Click;
+            this.Controls.Add(backButton);
+
+
         }
+        //hombutton click event
+        private void BackButton_Click(object sender, EventArgs e)
+        {
+            this.Hide(); 
+            MainMenuForm mainMenu = new MainMenuForm();
+            mainMenu.ShowDialog(); 
+            this.Close(); 
+        }
+
+
 
         private void InitializeGrids(int[,] savedPlayerGrid = null)
         {
@@ -622,6 +645,7 @@ namespace Nonogram
                 File.WriteAllText(settingsFilePath, gridSize.ToString());
             }
         }
+
 
     }
 }

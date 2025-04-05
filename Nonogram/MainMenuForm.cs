@@ -11,12 +11,12 @@ namespace Nonogram
         {
             InitializeComponent();
             this.Text = "Nonogram - Main Menu";
-            this.Size = new System.Drawing.Size(300, 200);
+            this.Size = new System.Drawing.Size(500, 400);
             this.StartPosition = FormStartPosition.CenterScreen;
-            
+
             Button loadButton = new Button
             {
-                Text = "Load Game",
+                Text = "Load Last Game",
                 Size = new Size(200, 50),
                 Location = new Point(50, 150)
             };
@@ -65,12 +65,11 @@ namespace Nonogram
             this.Hide();
             Form1 gameForm = new Form1(SelectedGridSize);  // Pass selected grid size to Form1
             gameForm.ShowDialog();
-            this.Close();
+            this.Show();
         }
 
         private void LoadButton_Click(object sender, EventArgs e)
         {
-
             // Load saved game data and grid size from the file
             string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\SavedGrid.json");
 
@@ -82,10 +81,14 @@ namespace Nonogram
                 // Convert jagged array to multidimensional array
                 int[,] playerGrid = ConvertJaggedToMultidimensionalArray(jaggedPlayerGrid);
 
-                // Pass the converted player grid to Form1
-                Form1 gameForm = new Form1(5, playerGrid);  // Use your default grid size or saved one
-                gameForm.Show();
+                // Dynamically get grid size from loaded data
+                int savedGridSize = playerGrid.GetLength(0); // Assuming square grid
+
+                // Pass the loaded grid and size to Form1
                 this.Hide();
+                Form1 gameForm = new Form1(savedGridSize, playerGrid);
+                gameForm.ShowDialog();
+                this.Show();
             }
             else
             {
@@ -97,7 +100,7 @@ namespace Nonogram
             int rows = jaggedArray.Length;
             int cols = jaggedArray[0].Length;
             int[,] multiArray = new int[rows, cols];
-                
+
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < cols; j++)
