@@ -24,7 +24,7 @@ namespace Nonogram
         private bool[,] solutionGrid;
         private int[,] playerGrid;
 
-        private bool PlayerSolved = false;
+        private bool PlayerSolved = true;
         private int solvedPuzzlesCount = 0;
         private Label solvedPuzzlesLabel;
         public Form1()
@@ -371,6 +371,7 @@ namespace Nonogram
             {
                 solvedPuzzlesCount++;
                 UpdateSolvedPuzzlesLabel();
+                PlayerSolved = false;
             }
             MessageBox.Show("Puzzle Solved!", "Nonogram", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -555,7 +556,7 @@ namespace Nonogram
 
         private async void ResetButton_Click(object sender, EventArgs e)
         {
-            PlayerSolved = true;
+            PlayerSolved = false;
 
             if (settings.animationsEnabled)
             {
@@ -591,7 +592,7 @@ namespace Nonogram
         {
 
         }
-
+            
         private void timer1_Tick(object sender, EventArgs e)
         {
             labelTime.Text = (DateTime.Now - _start).ToString(@"mm\:ss");
