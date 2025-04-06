@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Nonogram.Properties.Resources">
+    <Position X="15.25" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABEAAAAQAAAAAAAAAAAAAAAIA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nonogram.Form1">
+    <Position X="17.5" Y="1" Width="1.5" />
+    <NestedTypes>
+      <Class Name="Nonogram.Form1.GameSettings" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Form1.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>oBSAIhQAQCEAwBAIBQCgACACAMCYtgBCAnQsACJSCiA=</HashCode>
+      <FileName>Form1.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nonogram.LoginForm">
+    <Position X="13" Y="2.5" Width="1.5" />
+    <NestedTypes>
+      <Class Name="Nonogram.LoginForm.User" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>LoginForm.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAACgEABAAAACAAAACAAAACEACABIAAABgAEA=</HashCode>
+      <FileName>LoginForm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nonogram.MainMenuForm">
+    <Position X="15.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAACAAAAAAAACAAAACAAAAAAAAAAgAAAAAQIA=</HashCode>
+      <FileName>MainMenuForm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nonogram.Program">
+    <Position X="13" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Settings">
+    <Position X="15.25" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgIAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAA=</HashCode>
+      <FileName>settings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
