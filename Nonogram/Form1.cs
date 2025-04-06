@@ -275,6 +275,43 @@ namespace Nonogram
             }
         }
 
+        private string GetRowClueFromPlayer(int row)
+        {
+            string clue = "";
+            int count = 0;
+
+            for (int col = 0; col < GridSize; col++)
+            {
+                if (playerGrid[row, col] == 1) count++;
+                else if (count > 0)
+                {
+                    clue += count + " ";
+                    count = 0;
+                }
+            }
+            if (count > 0) clue += count;
+
+            return string.IsNullOrEmpty(clue) ? "0" : clue.Trim();
+        }
+
+        private string GetColumnClueFromPlayer(int col)
+        {
+            string clue = "";
+            int count = 0;
+
+            for (int row = 0; row < GridSize; row++)
+            {
+                if (playerGrid[row, col] == 1) count++;
+                else if (count > 0)
+                {
+                    clue += count + " ";
+                    count = 0;
+                }
+            }
+            if (count > 0) clue += count;
+
+            return string.IsNullOrEmpty(clue) ? "0" : clue.Trim();
+        }
 
         private async Task AnimateFillCell(int row, int col)
         {
