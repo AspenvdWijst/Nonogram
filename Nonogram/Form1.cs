@@ -23,15 +23,21 @@ namespace Nonogram
         //Variables for the different grids
         private bool[,] solutionGrid;
         private int[,] playerGrid;
-
         private bool PlayerSolved = true;
         private int solvedPuzzlesCount = 0;
         private Label solvedPuzzlesLabel;
-        public Form1()
+        public Form1(int gridSize, int[,] savedPlayerGrid = null)
         {
             InitializeComponent();
             InitializeSolvedPuzzlesLabel();
-            settings = Settings.Load();//load in the settings of the user
+            this.GridSize = gridSize;
+            this.CellSize = (gridSize <= 10) ? 100 : (gridSize <= 15) ? 50 : 40;
+            this.ClueSize = this.CellSize * (gridSize >= 15 ? 4 : 1); // Adjust clue size dynamically
+            InitializeGrids(savedPlayerGrid); // Initialize grids with saved data if available
+            this.Invalidate(); // Redraw
+            settings = Settings.Load();
+            SaveGrid();
+            settings = Settings.Load();
             this.Paint += new PaintEventHandler(this.OnPaint);
             this.MouseClick += new MouseEventHandler(this.OnMouseClick);
             this.Size = new Size(1920, 1080);
@@ -40,17 +46,37 @@ namespace Nonogram
                           ControlStyles.OptimizedDoubleBuffer, true);
             timer1 = new System.Windows.Forms.Timer();
             timer1.Tick += new EventHandler(timer1_Tick);
-            ComboBoxInfo();//Initialize the combobox with its options and functions
-            InitializeGrids();//Start drawing the grid
+
+            this.FormClosed += (s, e) => Application.Exit();
+
+            //home button
+            Button backButton = new Button
+            {
+                Text = "Back to Main Menu",
+                Location = new Point(1700, 900), // bottomright
+                AutoSize = true
+            };
+            backButton.Click += BackButton_Click;
+            this.Controls.Add(backButton);
+            ComboBoxInfo();
+            InitializeGrids();
+        }
+        //hombutton click event
+        private void BackButton_Click(object sender, EventArgs e)
+        {
+            this.Hide(); 
+            MainMenuForm mainMenu = new MainMenuForm();
+            mainMenu.ShowDialog(); 
+            this.Close(); 
         }
 
-        private void InitializeGrids()
+
+
+        private void InitializeGrids(int[,] savedPlayerGrid = null)
         {
             timer1.Start();
             _start = DateTime.Now;
             solutionGrid = GenerateRandomSolution(GridSize, GridSize);//Generate a random solution based on gridsize
-            playerGrid = new int[GridSize, GridSize];//Create a new playergrid, this will become important later in the code
-        }
         private void InitializeSolvedPuzzlesLabel()
         {
             solvedPuzzlesLabel = new Label();
@@ -67,6 +93,19 @@ namespace Nonogram
             {
                 solvedPuzzlesLabel.Text = $"Puzzles Solved: {solvedPuzzlesCount}";
             }
+        }
+  
+            if (savedPlayerGrid != null)
+            {
+                // Use the saved player grid if available
+                playerGrid = savedPlayerGrid;
+            }
+            else
+            {
+                // Initialize a new empty player grid
+                playerGrid = new int[GridSize, GridSize];
+            }
+
         }
 
         private void ComboBoxInfo()
@@ -533,7 +572,22 @@ namespace Nonogram
             string jsonGrid = System.Text.Json.JsonSerializer.Serialize(jaggedGrid);
             await File.WriteAllTextAsync(filePath, jsonGrid);
         }
+        private int[][] ConvertToJaggedArray(int[,] twoDArray)
+        {
+            int rows = twoDArray.GetLength(0);
+            int cols = twoDArray.GetLength(1);
 
+            int[][] jaggedArray = new int[rows][];
+            for (int i = 0; i < rows; i++)
+            {
+                jaggedArray[i] = new int[cols];
+                for (int j = 0; j < cols; j++)
+                {
+                    jaggedArray[i][j] = twoDArray[i, j];
+                }
+            }
+            return jaggedArray;
+        }
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             var result = MessageBox.Show("Are you sure you want to exit? Unsaved progress will be lost", "Exit Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -617,5 +671,17 @@ namespace Nonogram
         {
 
         }
+public static class GameSettings
+        {
+            private static string settingsFilePath = "settings.txt";
+
+            public static void SaveGridSize(int gridSize)
+            {
+                File.WriteAllText(settingsFilePath, gridSize.ToString());
+            }
+        }
+
+
+            }
     }
 }
