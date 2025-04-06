@@ -37,8 +37,6 @@
             ResetButton = new Button();
             NewPuzzleBtn = new Button();
             SolveBtn = new Button();
-            SizeComboBox = new ComboBox();
-            label3 = new Label();
             timer1 = new System.Windows.Forms.Timer(components);
             labelTime = new Label();
             button1 = new Button();
@@ -123,27 +121,6 @@
             SolveBtn.UseVisualStyleBackColor = true;
             SolveBtn.Click += SolveBtn_Click;
             // 
-            // SizeComboBox
-            // 
-            SizeComboBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            SizeComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
-            SizeComboBox.FormattingEnabled = true;
-            SizeComboBox.Location = new Point(1691, 59);
-            SizeComboBox.Name = "SizeComboBox";
-            SizeComboBox.Size = new Size(121, 23);
-            SizeComboBox.TabIndex = 8;
-            // 
-            // label3
-            // 
-            label3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            label3.AutoSize = true;
-            label3.Location = new Point(1691, 41);
-            label3.Name = "label3";
-            label3.Size = new Size(62, 15);
-            label3.TabIndex = 9;
-            label3.Text = "Puzzle size";
-            label3.Click += label3_Click;
-            // 
             // timer1
             // 
             timer1.Enabled = true;
@@ -190,11 +167,9 @@
             Controls.Add(button2);
             Controls.Add(button1);
             Controls.Add(labelTime);
-            Controls.Add(SizeComboBox);
             Controls.Add(SolveBtn);
             Controls.Add(NewPuzzleBtn);
             Controls.Add(ResetButton);
-            Controls.Add(label3);
             Controls.Add(pictureBox2);
             Controls.Add(pictureBox1);
             Controls.Add(label2);
@@ -217,8 +192,6 @@
         private Button ResetButton;
         private Button NewPuzzleBtn;
         private Button SolveBtn;
-        private ComboBox SizeComboBox;
-        private Label label3;
         private System.Windows.Forms.Timer timer1;
         private Label labelTime;
         private Button button1;
