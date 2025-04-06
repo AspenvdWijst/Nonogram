@@ -10,7 +10,8 @@ namespace NonogramTest
 
         public Form1Tests()
         {
-            form = new Form1();
+            int gridSize = 0;
+            form = new Form1(gridSize);
 
             // Inject a known solution grid for predictable results
             typeof(Form1).GetField("GridSize", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(form, 5);
