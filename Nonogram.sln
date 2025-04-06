@@ -5,7 +5,7 @@ VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nonogram", "Nonogram\Nonogram.csproj", "{9DF1E81D-2DAE-400F-A01C-AEED7CBD4F7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nonogram.Tests", "Nonogram.Tests\Nonogram.Tests.csproj", "{D3543FDF-C7A4-4E44-AF02-36D246C41626}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NonogramTest", "NonogramTest\NonogramTest.csproj", "{26E04531-12D3-40D7-9318-8068984CC8B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,15 +17,15 @@ Global
 		{9DF1E81D-2DAE-400F-A01C-AEED7CBD4F7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DF1E81D-2DAE-400F-A01C-AEED7CBD4F7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DF1E81D-2DAE-400F-A01C-AEED7CBD4F7A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D3543FDF-C7A4-4E44-AF02-36D246C41626}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D3543FDF-C7A4-4E44-AF02-36D246C41626}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D3543FDF-C7A4-4E44-AF02-36D246C41626}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D3543FDF-C7A4-4E44-AF02-36D246C41626}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26E04531-12D3-40D7-9318-8068984CC8B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26E04531-12D3-40D7-9318-8068984CC8B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26E04531-12D3-40D7-9318-8068984CC8B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26E04531-12D3-40D7-9318-8068984CC8B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {090FF0E2-803C-48EF-83F8-488CDDEA654C}
+		SolutionGuid = {91BDF7B4-C767-4780-9E43-83B4A8199983}
 	EndGlobalSection
 EndGlobal
