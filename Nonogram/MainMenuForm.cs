@@ -18,7 +18,7 @@ namespace Nonogram
             {
                 Text = "Load Last Game",
                 Size = new Size(200, 50),
-                Location = new Point(50, 150)
+                Location = new Point(150, 200)
             };
             loadButton.Click += LoadButton_Click;
             Controls.Add(loadButton);
@@ -26,14 +26,22 @@ namespace Nonogram
             Label titleLabel = new Label()
             {
                 Text = "Select Grid Size:",
-                Location = new System.Drawing.Point(50, 30),
+                Location = new System.Drawing.Point(175, 60),
                 AutoSize = true
             };
             this.Controls.Add(titleLabel);
+                Label homeLabel = new Label()
+                {
+                    Text = "Nonogram",
+                    Location = new System.Drawing.Point(175, 20),
+                    Size = new Size (200,50),
+                    AutoSize = true
+                };
+            this.Controls.Add(homeLabel);
 
             ComboBox sizeComboBox = new ComboBox()
             {
-                Location = new System.Drawing.Point(50, 60),
+                Location = new System.Drawing.Point(175, 90),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             sizeComboBox.Items.AddRange(new string[] { "5x5", "10x10", "15x15", "20x20" });
@@ -53,7 +61,7 @@ namespace Nonogram
             Button startGameButton = new Button()
             {
                 Text = "Start New Game",
-                Location = new System.Drawing.Point(50, 100),
+                Location = new System.Drawing.Point(175, 120),
                 AutoSize = true
             };
             startGameButton.Click += StartGameButton_Click;
@@ -110,6 +118,11 @@ namespace Nonogram
             }
 
             return multiArray;
+        }
+
+        private void MainMenuForm_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
