@@ -68,7 +68,7 @@ namespace Nonogram
             {
                 MessageBox.Show("Login successful!");
                 this.Hide(); // Hide the login form
-                Form1 mainForm = new Form1();
+                MainMenuForm mainForm = new MainMenuForm();
                 mainForm.Show(); // Show the main form
             }
             else

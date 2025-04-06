@@ -1,17 +1,13 @@
+using System;
+using System.Drawing;
+using System.IO;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
 namespace Nonogram
 {
-    using System;
-    using System.IO;
-    using System.Text.Json;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using System.Drawing;
-    using System.Windows.Forms;
-    using Newtonsoft.Json;
-
     public partial class Form1 : Form
     {
-        //All sizes of the grid and animationspeed
         private int CellSize = 100;
         private int ClueSize = 100;
         private const int CluePadding = 10;
@@ -20,23 +16,21 @@ namespace Nonogram
         private Settings settings;
         private DateTime _start;
 
-        //Variables for the different grids
         private bool[,] solutionGrid;
         private int[,] playerGrid;
         private bool PlayerSolved = true;
         private int solvedPuzzlesCount = 0;
         private Label solvedPuzzlesLabel;
+
         public Form1(int gridSize, int[,] savedPlayerGrid = null)
         {
             InitializeComponent();
             InitializeSolvedPuzzlesLabel();
             this.GridSize = gridSize;
             this.CellSize = (gridSize <= 10) ? 100 : (gridSize <= 15) ? 50 : 40;
-            this.ClueSize = this.CellSize * (gridSize >= 15 ? 4 : 1); // Adjust clue size dynamically
+            this.ClueSize = this.CellSize * (gridSize >= 15 ? 4 : 1);
             InitializeGrids(savedPlayerGrid); // Initialize grids with saved data if available
             this.Invalidate(); // Redraw
-            settings = Settings.Load();
-            SaveGrid();
             settings = Settings.Load();
             this.Paint += new PaintEventHandler(this.OnPaint);
             this.MouseClick += new MouseEventHandler(this.OnMouseClick);
@@ -48,12 +42,10 @@ namespace Nonogram
             timer1.Tick += new EventHandler(timer1_Tick);
 
             this.FormClosed += (s, e) => Application.Exit();
-
-            //home button
             Button backButton = new Button
             {
                 Text = "Back to Main Menu",
-                Location = new Point(1700, 900), // bottomright
+                Location = new Point(1700, 900),
                 AutoSize = true
             };
             backButton.Click += BackButton_Click;
@@ -61,22 +53,14 @@ namespace Nonogram
             ComboBoxInfo();
             InitializeGrids();
         }
-        //hombutton click event
-        private void BackButton_Click(object sender, EventArgs e)
-        {
-            this.Hide(); 
-            MainMenuForm mainMenu = new MainMenuForm();
-            mainMenu.ShowDialog(); 
-            this.Close(); 
-        }
-
-
 
         private void InitializeGrids(int[,] savedPlayerGrid = null)
         {
             timer1.Start();
             _start = DateTime.Now;
-            solutionGrid = GenerateRandomSolution(GridSize, GridSize);//Generate a random solution based on gridsize
+            solutionGrid = GenerateRandomSolution(GridSize, GridSize);
+        }
+
         private void InitializeSolvedPuzzlesLabel()
         {
             solvedPuzzlesLabel = new Label();
@@ -93,19 +77,6 @@ namespace Nonogram
             {
                 solvedPuzzlesLabel.Text = $"Puzzles Solved: {solvedPuzzlesCount}";
             }
-        }
-  
-            if (savedPlayerGrid != null)
-            {
-                // Use the saved player grid if available
-                playerGrid = savedPlayerGrid;
-            }
-            else
-            {
-                // Initialize a new empty player grid
-                playerGrid = new int[GridSize, GridSize];
-            }
-
         }
 
         private void ComboBoxInfo()
@@ -143,8 +114,8 @@ namespace Nonogram
                     break;
             }
 
-            InitializeGrids(); // Reset grid data
-            this.Invalidate(); // Repaint the form
+            InitializeGrids();
+            this.Invalidate();
         }
 
         private bool[,] GenerateRandomSolution(int rows, int cols)
@@ -156,7 +127,7 @@ namespace Nonogram
             {
                 for (int col = 0; col < cols; col++)
                 {
-                    grid[row, col] = rand.Next(2) == 1; // Randomly assign true (1) or false (0)
+                    grid[row, col] = rand.Next(2) == 1;
                 }
             }
 
@@ -182,8 +153,6 @@ namespace Nonogram
             int gridStartX = ClueSize;
             int gridStartY = ClueSize;
 
-
-
             for (int i = 0; i <= GridSize; i++)
             {
                 g.DrawLine(gridPen, gridStartX + i * CellSize, 0, gridStartX + i * CellSize, ClueSize);
@@ -208,13 +177,10 @@ namespace Nonogram
                 }
             }
 
-            // Draw grid
+            // Draw grid lines
             for (int i = 0; i <= GridSize; i++)
             {
-                // Vertical lines
                 g.DrawLine(gridPen, gridStartX + i * CellSize, gridStartY, gridStartX + i * CellSize, gridStartY + GridSize * CellSize);
-
-                // Horizontal lines
                 g.DrawLine(gridPen, gridStartX, gridStartY + i * CellSize, gridStartX + GridSize * CellSize, gridStartY + i * CellSize);
             }
 
@@ -274,78 +240,6 @@ namespace Nonogram
             return string.IsNullOrEmpty(clue) ? "0" : clue.Trim();
         }
 
-        private async void OnMouseClick(object sender, MouseEventArgs e)
-        {
-            int gridStartX = ClueSize;
-            int gridStartY = ClueSize;
-
-            int col = (e.X - gridStartX) / CellSize;
-            int row = (e.Y - gridStartY) / CellSize;
-
-            if (row >= 0 && row < GridSize && col >= 0 && col < GridSize)
-            {
-                if (e.Button == MouseButtons.Left)
-                {
-                    // Toggle between empty and filled
-                    if (playerGrid[row, col] == 1)
-                        playerGrid[row, col] = 0; // If already filled, empty it
-                    else
-                    {
-                        if (settings.animationsEnabled)
-                            await AnimateFillCell(row, col);
-                        else
-                            playerGrid[row, col] = 1;
-                    }
-                }
-                else if (e.Button == MouseButtons.Right)
-                {
-                    // Toggle between empty and X
-                    playerGrid[row, col] = (playerGrid[row, col] == 2) ? 0 : 2;
-                }
-
-                SaveGrid();
-                this.Invalidate(); // Redraw the form
-                CheckWinCondition();
-            }
-        }
-
-        private string GetRowClueFromPlayer(int row)
-        {
-            string clue = "";
-            int count = 0;
-
-            for (int col = 0; col < GridSize; col++)
-            {
-                if (playerGrid[row, col] == 1) count++;
-                else if (count > 0)
-                {
-                    clue += count + " ";
-                    count = 0;
-                }
-            }
-            if (count > 0) clue += count;
-
-            return string.IsNullOrEmpty(clue) ? "0" : clue.Trim();
-        }
-
-        private string GetColumnClueFromPlayer(int col)
-        {
-            string clue = "";
-            int count = 0;
-
-            for (int row = 0; row < GridSize; row++)
-            {
-                if (playerGrid[row, col] == 1) count++;
-                else if (count > 0)
-                {
-                    clue += count + " ";
-                    count = 0;
-                }
-            }
-            if (count > 0) clue += count;
-
-            return string.IsNullOrEmpty(clue) ? "0" : clue.Trim();
-        }
 
         private async Task AnimateFillCell(int row, int col)
         {
@@ -672,16 +566,11 @@ namespace Nonogram
 
         }
 public static class GameSettings
-        {
-            private static string settingsFilePath = "settings.txt";
+{
+    private static string settingsFilePath = "settings.txt";
 
-            public static void SaveGridSize(int gridSize)
-            {
-                File.WriteAllText(settingsFilePath, gridSize.ToString());
-            }
-        }
-
-
-            }
+    public static void SaveGridSize(int gridSize)
+    {
+        File.WriteAllText(settingsFilePath, gridSize.ToString());
     }
 }
