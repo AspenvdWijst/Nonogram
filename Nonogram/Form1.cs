@@ -240,6 +240,41 @@ namespace Nonogram
             return string.IsNullOrEmpty(clue) ? "0" : clue.Trim();
         }
 
+        private async void OnMouseClick(object sender, MouseEventArgs e)
+        {
+            int gridStartX = ClueSize;
+            int gridStartY = ClueSize;
+
+            int col = (e.X - gridStartX) / CellSize;
+            int row = (e.Y - gridStartY) / CellSize;
+
+            if (row >= 0 && row < GridSize && col >= 0 && col < GridSize)
+            {
+                if (e.Button == MouseButtons.Left)
+                {
+                    // Toggle between empty and filled
+                    if (playerGrid[row, col] == 1)
+                        playerGrid[row, col] = 0; // If already filled, empty it
+                    else
+                    {
+                        if (settings.animationsEnabled)
+                            await AnimateFillCell(row, col);
+                        else
+                            playerGrid[row, col] = 1;
+                    }
+                }
+                else if (e.Button == MouseButtons.Right)
+                {
+                    // Toggle between empty and X
+                    playerGrid[row, col] = (playerGrid[row, col] == 2) ? 0 : 2;
+                }
+
+                SaveGrid();
+                this.Invalidate(); // Redraw the form
+                CheckWinCondition();
+            }
+        }
+
 
         private async Task AnimateFillCell(int row, int col)
         {
@@ -540,7 +575,7 @@ namespace Nonogram
         {
 
         }
-            
+
         private void timer1_Tick(object sender, EventArgs e)
         {
             labelTime.Text = (DateTime.Now - _start).ToString(@"mm\:ss");
@@ -565,12 +600,14 @@ namespace Nonogram
         {
 
         }
-public static class GameSettings
-{
-    private static string settingsFilePath = "settings.txt";
+        public static class GameSettings
+        {
+            private static string settingsFilePath = "settings.txt";
 
-    public static void SaveGridSize(int gridSize)
-    {
-        File.WriteAllText(settingsFilePath, gridSize.ToString());
+            public static void SaveGridSize(int gridSize)
+            {
+                File.WriteAllText(settingsFilePath, gridSize.ToString());
+            }
+        }
     }
 }
