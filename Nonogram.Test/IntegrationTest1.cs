@@ -32,31 +32,31 @@ namespace NonogramTests
 
         // Test method om newpuzzlebutton te testen WERKT ALLEEN ZONDER TIMER
 
-        //[TestMethod]
-        //public void Test_NewPuzzle_ResetsPlayerGrid()
-        //{
-        //    form.Invoke((MethodInvoker)(() =>
-        //    {
-        //        form.NewPuzzleBtn_Click(null, EventArgs.Empty);
+        [TestMethod]
+        public async Task Test_NewPuzzle_ResetsPlayerGrid()
+        {
+            form.Invoke((MethodInvoker)(async () =>
+            {
+                form.NewPuzzleBtn_Click(null, EventArgs.Empty);
 
-        //        // Wait a bit for the UI to process the reset
-        //        Thread.Sleep(500); // Adjust the sleep duration if necessary
+                // Wait a bit for the UI to process the reset
+                await Task.Delay(500);
 
-        //        bool allEmpty = true;
-        //        for (int i = 0; i < 5; i++) // Default 5x5
-        //        {
-        //            for (int j = 0; j < 5; j++)
-        //            {
-        //                if (GetPrivateGrid(form)[i, j] != 0)
-        //                {
-        //                    allEmpty = false;
-        //                    break;
-        //                }
-        //            }
-        //        }
-        //        Assert.IsTrue(allEmpty, "New puzzle should reset the grid to all empty.");
-        //    }));
-        //}
+                bool allEmpty = true;
+                for (int i = 0; i < 5; i++) // Default 5x5
+                {
+                    for (int j = 0; j < 5; j++)
+                    {
+                        if (GetPrivateGrid(form)[i, j] != 0)
+                        {
+                            allEmpty = false;
+                            break;
+                        }
+                    }
+                }
+                Assert.IsTrue(allEmpty, "New puzzle should reset the grid to all empty.");
+            }));
+        }
 
         // Test if a cell click updates the grid correctly
         [TestMethod]

@@ -643,7 +643,8 @@ namespace Nonogram
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            timer1.Start();
+            _start = DateTime.Now;
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -668,17 +669,13 @@ namespace Nonogram
             }
         }
 
-        public async void NewPuzzleBtn_Click(object sender, EventArgs e)
+        public void NewPuzzleBtn_Click(object sender, EventArgs e)
         {
             PlayerSolved = true; // Mark current puzzle as completed
             timer1.Start();
             _start = DateTime.Now;
-            // Run puzzle initialization in a background thread
-            await Task.Run(() =>
-            {
-                InitializeGrids(); // Set up a new puzzle
-            });
-
+            
+            InitializeGrids(); // Set up a new puzzle
             this.Invalidate(); // Redraw the new puzzle
         }
 
@@ -698,6 +695,7 @@ namespace Nonogram
 
         private void timer1_Tick(object sender, EventArgs e)
         {
+            System.Diagnostics.Debug.WriteLine("Tick fired");
             // Show elapsed time in the correct  format
             labelTime.Text = (DateTime.Now - _start).ToString(@"hh\:mm\:ss");
         }
