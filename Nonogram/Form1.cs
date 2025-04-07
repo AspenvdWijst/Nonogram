@@ -8,25 +8,30 @@ namespace Nonogram
 {
     public partial class Form1 : Form
     {
-        private int CellSize = 100;
-        private int ClueSize = 100;
-        private const int CluePadding = 10;
-        private const int AnimationSpeed = 10;
-        private int GridSize = 5;
-        private Settings settings;
-        private DateTime _start;
+        // Grid and clue display settings
+        private int CellSize = 100;          // Size of each cell in the puzzle grid
+        private int ClueSize = 100;          // Space for the clues around the grid
+        private const int CluePadding = 10;  // Padding between clues and grid
+        private const int AnimationSpeed = 10; // Speed for the animations
+        private int GridSize = 5;            // Size of the grid width+height
+        private Settings settings;           // Placeholder for settings
+        private DateTime _start;             // Start moment for the timer
 
-        private bool[,] solutionGrid;
-        private int[,] playerGrid;
-        private bool PlayerSolved = true;
-        private int solvedPuzzlesCount = 0;
-        private Label solvedPuzzlesLabel;
+        // Game state variables
+        private bool[,] solutionGrid;        // The correct solution grid
+        private int[,] playerGrid;           // The player's current progress on the grid
+        private bool PlayerSolved = true;    // Check if the player has solved the puzzle
+        private int solvedPuzzlesCount = 0;  // Keeps track of the amount of puzzles solved
+        private Label solvedPuzzlesLabel;    // Label to display how many puzzles have been solved
 
+        // Constructor for Form1
         public Form1(int gridSize, int[,] savedPlayerGrid = null)
         {
-            InitializeComponent();
-            InitializeSolvedPuzzlesLabel();
-            this.GridSize = gridSize;
+            InitializeComponent();               
+            InitializeSolvedPuzzlesLabel();      // Initialize the label that tracks solved puzzles
+            this.GridSize = gridSize;            // Set grid size based on input
+
+            // Custom sizes based on different gridsizes
             switch (gridSize)
             {
                 case 5:
@@ -50,16 +55,21 @@ namespace Nonogram
                     CellSize = 40;
                     break;
             }
-            this.playerGrid = playerGrid;
-            InitializeGrids(savedPlayerGrid); // Initialize grids with saved data if available
-            this.Invalidate(); // Redraw
-            settings = Settings.Load();
-            this.Paint += new PaintEventHandler(this.OnPaint);
-            this.MouseClick += new MouseEventHandler(this.OnMouseClick);
-            this.Size = new Size(1920, 1080);
+
+            this.playerGrid = playerGrid;                     // Assign player grid reference
+            InitializeGrids(savedPlayerGrid);                 // Initialize the grid, with save data if that exists
+            this.Invalidate();                                // Repaint the form
+            settings = Settings.Load();                       // Load game settings
+            this.Paint += new PaintEventHandler(this.OnPaint);        // Custom paint event
+            this.MouseClick += new MouseEventHandler(this.OnMouseClick); // Custom mouse click handler
+            this.Size = new Size(1920, 1080);                 // Set window size
+
+            // Enable double buffering for smooth drawing and prevent flickering
             this.SetStyle(ControlStyles.AllPaintingInWmPaint |
                           ControlStyles.UserPaint |
                           ControlStyles.OptimizedDoubleBuffer, true);
+
+            // Logic for the timer
             timer1 = new System.Windows.Forms.Timer();
             timer1.Tick += new EventHandler(timer1_Tick);
 
@@ -126,6 +136,7 @@ namespace Nonogram
             bool[,] grid = new bool[rows, cols];
             Random rand = new Random();
 
+            // Fill each cell randomly with true (filled) or false (empty)
             for (int row = 0; row < rows; row++)
             {
                 for (int col = 0; col < cols; col++)
@@ -134,60 +145,75 @@ namespace Nonogram
                 }
             }
 
-            return grid;
+            return grid; // Return the randomly generated solution grid
         }
 
         private void OnPaint(object sender, PaintEventArgs e)
         {
+            // Create a bitmap to draw on, to reduce flickering (off-screen rendering)
             Bitmap offscreenBitmap = new Bitmap(this.Width, this.Height);
             using (Graphics g = Graphics.FromImage(offscreenBitmap))
             {
-                DrawGame(g);
+                DrawGame(g); // Draw the full game state on the bitmap
             }
+
+            // Draw the off-screen bitmap to the actual screen
             e.Graphics.DrawImage(offscreenBitmap, 0, 0);
         }
 
         private void DrawGame(Graphics g)
         {
-            Pen gridPen = new Pen(Color.Black, 2);
-            Font clueFont = new Font("Arial", 14);
-            Brush textBrush = Brushes.Black;
+            Pen gridPen = new Pen(Color.Black, 2); // Pen for grid lines
+            Font clueFont = new Font("Arial", 14); // Font for clue numbers
+            Brush textBrush = Brushes.Black;       // Brush for drawing text
 
-            int gridStartX = ClueSize;
-            int gridStartY = ClueSize;
+            int gridStartX = ClueSize; // X start position of the actual grid (leaves space for column clues)
+            int gridStartY = ClueSize; // Y start position of the actual grid (leaves space for row clues)
 
+            // Draw column lines above the grid for clues
             for (int i = 0; i <= GridSize; i++)
             {
                 g.DrawLine(gridPen, gridStartX + i * CellSize, 0, gridStartX + i * CellSize, ClueSize);
                 g.DrawLine(gridPen, 0, gridStartY + i * CellSize, ClueSize, gridStartY + i * CellSize);
             }
 
-            // Draw row clues
+            // Draw row clues to the left of the grid
             for (int row = 0; row < GridSize; row++)
             {
-                string clue = GetRowClue(row);
-                g.DrawString(clue, clueFont, textBrush, ClueSize - CluePadding - g.MeasureString(clue, clueFont).Width, gridStartY + row * CellSize + 10);
+                string clue = GetRowClue(row); // Get clue string for this row
+               
+                // Draw the clue right-aligned inside the clue area
+                g.DrawString(clue, clueFont, textBrush,
+                    ClueSize - CluePadding - g.MeasureString(clue, clueFont).Width,
+                    gridStartY + row * CellSize + 10);
             }
 
-            // Draw column clues
+            // Draw column clues above the grid
             for (int col = 0; col < GridSize; col++)
             {
-                string clue = GetColumnClue(col);
-                string[] numbers = clue.Split(' ');
+                string clue = GetColumnClue(col); // Get clue string for this column
+                string[] numbers = clue.Split(' '); // Split clue into individual numbers
                 for (int i = 0; i < numbers.Length; i++)
                 {
-                    g.DrawString(numbers[i], clueFont, textBrush, gridStartX + col * CellSize + 10, ClueSize - CluePadding - ((numbers.Length - i) * 20));
+                    // Draw each clue number stacked vertically
+                    g.DrawString(numbers[i], clueFont, textBrush,
+                        gridStartX + col * CellSize + 10,
+                        ClueSize - CluePadding - ((numbers.Length - i) * 20));
                 }
             }
 
-            // Draw grid lines
+            // Draw main grid lines
             for (int i = 0; i <= GridSize; i++)
             {
-                g.DrawLine(gridPen, gridStartX + i * CellSize, gridStartY, gridStartX + i * CellSize, gridStartY + GridSize * CellSize);
-                g.DrawLine(gridPen, gridStartX, gridStartY + i * CellSize, gridStartX + GridSize * CellSize, gridStartY + i * CellSize);
+                // Vertical lines
+                g.DrawLine(gridPen, gridStartX + i * CellSize, gridStartY,
+                                     gridStartX + i * CellSize, gridStartY + GridSize * CellSize);
+                // Horizontal lines
+                g.DrawLine(gridPen, gridStartX, gridStartY + i * CellSize,
+                                     gridStartX + GridSize * CellSize, gridStartY + i * CellSize);
             }
 
-            // Draw player-filled cells
+            // Draw the player's filled or marked cells
             for (int row = 0; row < GridSize; row++)
             {
                 for (int col = 0; col < GridSize; col++)
@@ -197,16 +223,19 @@ namespace Nonogram
 
                     if (playerGrid[row, col] == 1)
                     {
+                        // Filled cell (black)
                         g.FillRectangle(Brushes.Black, x + 2, y + 2, CellSize - 4, CellSize - 4);
                     }
                     else if (playerGrid[row, col] == 2)
                     {
+                        // Marked as empty (with an "X")
                         g.DrawString("X", clueFont, Brushes.Black, x + 15, y + 10);
                     }
                 }
             }
         }
 
+        // Generates the clue string for a given row based on the solution grid
         private string GetRowClue(int row)
         {
             string clue = "";
@@ -214,17 +243,19 @@ namespace Nonogram
 
             for (int col = 0; col < GridSize; col++)
             {
-                if (solutionGrid[row, col]) count++;
+                if (solutionGrid[row, col]) count++; // Count consecutive filled cells
                 else if (count > 0)
                 {
-                    clue += count + " ";
+                    clue += count + " "; // Add group size to clue string
                     count = 0;
                 }
             }
-            if (count > 0) clue += count;
-            return string.IsNullOrEmpty(clue) ? "0" : clue.Trim();
+            if (count > 0) clue += count; // Add last group if it ends at the row's end
+
+            return string.IsNullOrEmpty(clue) ? "0" : clue.Trim(); // Return "0" if no filled cells
         }
 
+        // Generates the clue string for a given column based on the solution grid
         private string GetColumnClue(int col)
         {
             string clue = "";
@@ -240,44 +271,49 @@ namespace Nonogram
                 }
             }
             if (count > 0) clue += count;
+
             return string.IsNullOrEmpty(clue) ? "0" : clue.Trim();
         }
 
+        // Handles mouse click events on the game board
         private async void OnMouseClick(object sender, MouseEventArgs e)
         {
             int gridStartX = ClueSize;
             int gridStartY = ClueSize;
 
+            // Determine which cell was clicked
             int col = (e.X - gridStartX) / CellSize;
             int row = (e.Y - gridStartY) / CellSize;
 
+            // Make sure the click is within the grid bounds
             if (row >= 0 && row < GridSize && col >= 0 && col < GridSize)
             {
                 if (e.Button == MouseButtons.Left)
                 {
                     // Toggle between empty and filled
                     if (playerGrid[row, col] == 1)
-                        playerGrid[row, col] = 0; // If already filled, empty it
+                        playerGrid[row, col] = 0; // Unfill the cell
                     else
                     {
                         if (settings.animationsEnabled)
-                            await AnimateFillCell(row, col);
+                            await AnimateFillCell(row, col); // Animate fill if enabled
                         else
-                            playerGrid[row, col] = 1;
+                            playerGrid[row, col] = 1; // Fill the cell
                     }
                 }
                 else if (e.Button == MouseButtons.Right)
                 {
-                    // Toggle between empty and X
+                    // Toggle between empty and marked (X)
                     playerGrid[row, col] = (playerGrid[row, col] == 2) ? 0 : 2;
                 }
 
-                SaveGrid();
-                this.Invalidate(); // Redraw the form
-                CheckWinCondition();
+                SaveGrid();         // Save the current state of the grid
+                this.Invalidate();  // Redraw the grid
+                CheckWinCondition(); // Check if the puzzle is solved
             }
         }
 
+        // Generate clue string for a row based on the player's current grid
         private string GetRowClueFromPlayer(int row)
         {
             string clue = "";
@@ -297,6 +333,7 @@ namespace Nonogram
             return string.IsNullOrEmpty(clue) ? "0" : clue.Trim();
         }
 
+        // Generate clue string for a column based on the player's current grid
         private string GetColumnClueFromPlayer(int col)
         {
             string clue = "";
@@ -316,14 +353,16 @@ namespace Nonogram
             return string.IsNullOrEmpty(clue) ? "0" : clue.Trim();
         }
 
+        // Animate a cell being filled by gradually increasing the size of the black square
         private async Task AnimateFillCell(int row, int col)
         {
             int steps = 10; // Number of animation steps
-            int delay = AnimationSpeed; // Speed of animation
+            int delay = AnimationSpeed; // Delay between frames
 
             for (int i = 0; i <= steps; i++)
             {
                 float scale = (float)i / steps;
+
                 using (Graphics g = this.CreateGraphics())
                 {
                     int gridStartX = ClueSize;
@@ -331,62 +370,75 @@ namespace Nonogram
                     int x = gridStartX + col * CellSize;
                     int y = gridStartY + row * CellSize;
 
-                    g.FillRectangle(Brushes.Black, x + (CellSize * (1 - scale)) / 2,
+                    // Calculate size and position based on animation step
+                    g.FillRectangle(Brushes.Black,
+                                    x + (CellSize * (1 - scale)) / 2,
                                     y + (CellSize * (1 - scale)) / 2,
-                                    CellSize * scale, CellSize * scale);
+                                    CellSize * scale,
+                                    CellSize * scale);
                 }
-                await Task.Delay(delay);
+
+                await Task.Delay(delay); // Wait for the next frame
             }
-            playerGrid[row, col] = 1;
-            this.Invalidate(); // Finalize drawing
+
+            playerGrid[row, col] = 1; // Finalize the cell as filled
+            this.Invalidate();        // Redraw the form to reflect final state
         }
 
+        // Fades out the board and resets the player grid
         private async Task AnimateBoardReset()
         {
             int steps = 10; // Number of fade-out steps
-            int delay = AnimationSpeed; // Speed of animation
+            int delay = AnimationSpeed; // Delay between frames
 
             for (int i = steps; i >= 0; i--)
             {
-                float alpha = (float)i / steps;
+                float alpha = (float)i / steps; // Calculate transparency level
                 using (Graphics g = this.CreateGraphics())
                 {
-                    g.FillRectangle(new SolidBrush(Color.FromArgb((int)(255 * alpha), Color.White)), ClueSize, ClueSize, GridSize * CellSize, GridSize * CellSize);
+                    // Fill the grid area with a white overlay of decreasing opacity
+                    g.FillRectangle(
+                        new SolidBrush(Color.FromArgb((int)(255 * alpha), Color.White)),
+                        ClueSize, ClueSize, GridSize * CellSize, GridSize * CellSize
+                    );
                 }
                 await Task.Delay(delay);
             }
 
-            playerGrid = new int[GridSize, GridSize];
-            this.Invalidate(); // Redraw after animation
+            playerGrid = new int[GridSize, GridSize]; // Clear the grid
+            this.Invalidate(); // Trigger a redraw
         }
 
+        // Checks if the player's grid matches the solution grid
         private bool CheckWinCondition()
         {
-            // Check if the player grid matches the solution grid
+            // Compare row clues
             for (int row = 0; row < GridSize; row++)
             {
                 if (GetRowClueFromPlayer(row) != GetRowClue(row))
                     return false;
             }
 
+            // Compare column clues
             for (int col = 0; col < GridSize; col++)
             {
                 if (GetColumnClueFromPlayer(col) != GetColumnClue(col))
                     return false;
             }
 
+            // If puzzle was solved, update progress
             if (PlayerSolved == true)
             {
                 solvedPuzzlesCount++;
                 UpdateSolvedPuzzlesLabel();
                 PlayerSolved = false;
             }
-            MessageBox.Show("Puzzle Solved!", "Nonogram", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-            return true; // Puzzle solved
+            MessageBox.Show("Puzzle Solved!", "Nonogram", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return true;
         }
 
-
+        // Opens a settings window for toggling animations
         private void OpenSettingsWindow()
         {
             Form settingsForm = new Form()
@@ -409,6 +461,8 @@ namespace Nonogram
                 Text = "Save",
                 Location = new Point(50, 100)
             };
+
+            // Save the settings when the button is clicked
             saveButton.Click += (sender, e) =>
             {
                 settings.animationsEnabled = animationCheckBox.Checked;
@@ -421,11 +475,13 @@ namespace Nonogram
             settingsForm.ShowDialog();
         }
 
+        // Reveals a correct cell as a hint
         private async void GiveHint()
         {
             Random rand = new Random();
             List<(int, int)> possibleHints = new List<(int, int)>();
 
+            // Find cells that are incorrect or unmarked
             for (int row = 0; row < GridSize; row++)
             {
                 for (int col = 0; col < GridSize; col++)
@@ -437,12 +493,13 @@ namespace Nonogram
                 }
             }
 
+            // Show a random hint if possible
             if (possibleHints.Count > 0)
             {
                 var (hintRow, hintCol) = possibleHints[rand.Next(possibleHints.Count)];
                 playerGrid[hintRow, hintCol] = solutionGrid[hintRow, hintCol] ? 1 : 2;
-                this.Invalidate();
-                await Task.Delay(500); // Prevents hint spam
+                this.Invalidate(); // Redraw to show the hint
+                await Task.Delay(500); // Delay to prevent spam
             }
             else
             {
@@ -450,14 +507,17 @@ namespace Nonogram
             }
         }
 
+        // Automatically solves the puzzle cell by cell with animation
         private async void SolvePuzzle()
         {
-            DisableUI();
+            DisableUI(); // Prevent user interaction
             PlayerSolved = false;
+
             for (int row = 0; row < GridSize; row++)
             {
                 for (int col = 0; col < GridSize; col++)
                 {
+                    // Stop solving if user already completed the puzzle
                     if (CheckWinCondition())
                     {
                         EnableUI();
@@ -466,6 +526,7 @@ namespace Nonogram
 
                     bool shouldBeFilled = solutionGrid[row, col];
 
+                    // Simulate correct click depending on solution
                     if (shouldBeFilled && playerGrid[row, col] != 1)
                     {
                         SimulateClick(row, col, MouseButtons.Left);
@@ -475,24 +536,29 @@ namespace Nonogram
                         SimulateClick(row, col, MouseButtons.Right);
                     }
 
-                    await Task.Delay(100); // Smooth animation effect
+                    await Task.Delay(100); // Smooth animation
                 }
             }
-            EnableUI();
+
+            EnableUI(); // Re-enable user input
         }
 
+        // Simulates a mouse click on the given cell
         private void SimulateClick(int row, int col, MouseButtons button)
         {
             int gridStartX = ClueSize;
             int gridStartY = ClueSize;
 
+            // Calculate coordinates for center of the cell
             int x = gridStartX + col * CellSize + CellSize / 2;
             int y = gridStartY + row * CellSize + CellSize / 2;
 
+            // Create a fake MouseEventArgs and pass to OnMouseClick
             MouseEventArgs clickEvent = new MouseEventArgs(button, 1, x, y, 0);
             OnMouseClick(this, clickEvent);
         }
 
+        // Disables all interactive controls and mouse clicks
         private void DisableUI()
         {
             foreach (Control ctrl in this.Controls)
@@ -502,9 +568,11 @@ namespace Nonogram
                     ctrl.Enabled = false;
                 }
             }
-            this.MouseClick -= OnMouseClick; // Prevents user from editing cells
+
+            this.MouseClick -= OnMouseClick; // Detach click handler
         }
 
+        // Enables controls and mouse input
         private void EnableUI()
         {
             foreach (Control ctrl in this.Controls)
@@ -514,33 +582,11 @@ namespace Nonogram
                     ctrl.Enabled = true;
                 }
             }
-            this.MouseClick += OnMouseClick;
+
+            this.MouseClick += OnMouseClick; // Reattach click handler
         }
 
-        private T[][] ConvertToJaggedArray<T>(T[,] twoDArray)
-        {
-            int rows = twoDArray.GetLength(0);
-            int cols = twoDArray.GetLength(1);
-
-            T[][] jaggedArray = new T[rows][];
-            for (int i = 0; i < rows; i++)
-            {
-                jaggedArray[i] = new T[cols];
-                for (int j = 0; j < cols; j++)
-                {
-                    jaggedArray[i][j] = twoDArray[i, j];
-                }
-            }
-            return jaggedArray;
-        }
-
-        private async Task SaveGrid()
-        {
-            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\SavedGrid.json");
-            int[][] jaggedGrid = ConvertToJaggedArray(playerGrid);
-            string jsonGrid = System.Text.Json.JsonSerializer.Serialize(jaggedGrid);
-            await File.WriteAllTextAsync(filePath, jsonGrid);
-        }
+        // Convert the 2d array to a jagged array, so it can be saved in the JSON
         private int[][] ConvertToJaggedArray(int[,] twoDArray)
         {
             int rows = twoDArray.GetLength(0);
@@ -555,16 +601,30 @@ namespace Nonogram
                     jaggedArray[i][j] = twoDArray[i, j];
                 }
             }
+
             return jaggedArray;
         }
+
+        // Saves the player's grid as a JSON file
+        private async Task SaveGrid()
+        {
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\SavedGrid.json");
+            int[][] jaggedGrid = ConvertToJaggedArray(playerGrid);
+            string jsonGrid = System.Text.Json.JsonSerializer.Serialize(jaggedGrid);
+
+            await File.WriteAllTextAsync(filePath, jsonGrid); // Write async
+        }
+
+        // Ask the user for confirmation before closing the app
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             var result = MessageBox.Show("Are you sure you want to exit? Unsaved progress will be lost", "Exit Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.No)
             {
-                e.Cancel = true;
+                e.Cancel = true; // Cancel the close event
             }
-            base.OnFormClosing(e);
+
+            base.OnFormClosing(e); // Continue with default close behavior
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -579,36 +639,41 @@ namespace Nonogram
 
         private async void ResetButton_Click(object sender, EventArgs e)
         {
-            PlayerSolved = false;
+            PlayerSolved = false; // Reset solved state
 
+            // Use animation if enabled in settings
             if (settings.animationsEnabled)
             {
                 await AnimateBoardReset();
             }
             else
             {
+                // Instantly reset the player grid without animation
                 playerGrid = new int[GridSize, GridSize];
-                this.Invalidate();
+                this.Invalidate(); // Redraw the form
             }
         }
 
         private async void NewPuzzleBtn_Click(object sender, EventArgs e)
         {
-            PlayerSolved = true;
+            PlayerSolved = true; // Mark current puzzle as completed
 
+            // Run puzzle initialization in a background thread
             await Task.Run(() =>
             {
-                InitializeGrids();
+                InitializeGrids(); // Set up a new puzzle
             });
 
-            this.Invalidate();
+            this.Invalidate(); // Redraw the new puzzle
         }
 
         private void SolveBtn_Click(object sender, EventArgs e)
         {
+            // Disable buttons to prevent interaction during solving
             ResetButton.Enabled = false;
             NewPuzzleBtn.Enabled = false;
-            SolvePuzzle();
+
+            SolvePuzzle(); // Start solving animation
         }
 
         private void SizeComboBox_SelectedIndexChanged_1(object sender, EventArgs e)
@@ -618,6 +683,7 @@ namespace Nonogram
 
         private void timer1_Tick(object sender, EventArgs e)
         {
+            // Show elapsed time in the correct  format
             labelTime.Text = (DateTime.Now - _start).ToString(@"mm\:ss");
         }
 
@@ -628,12 +694,12 @@ namespace Nonogram
 
         private void button1_Click(object sender, EventArgs e)
         {
-            GiveHint();
+            GiveHint(); // Provide a hint to the user
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            OpenSettingsWindow();
+            OpenSettingsWindow(); // Open the settings dialog
         }
 
         private void label3_Click(object sender, EventArgs e)
