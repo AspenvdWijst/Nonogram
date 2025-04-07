@@ -71,9 +71,12 @@ namespace Nonogram
         private void StartGameButton_Click(object sender, EventArgs e)
         {
             this.Hide();
-            Form1 gameForm = new Form1(SelectedGridSize);  // Pass selected grid size to Form1
+            Form1 gameForm = new Form1(SelectedGridSize);
+            gameForm.FormClosed += (s, args) =>
+            {
+                this.Dispose();
+            };
             gameForm.Show();
-            this.Hide();
         }
 
         private void LoadButton_Click(object sender, EventArgs e)

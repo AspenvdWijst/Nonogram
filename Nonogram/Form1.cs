@@ -93,9 +93,12 @@ namespace Nonogram
         private void BackButton_Click(object sender, EventArgs e)
         {
             this.Hide();
-            MainMenuForm mainMenu = new MainMenuForm();
-            mainMenu.ShowDialog();
-            this.Close();
+            MainMenuForm mainMenuForm = new MainMenuForm();
+            mainMenuForm.FormClosed += (s, args) =>
+            {
+                this.Dispose();
+            };
+            mainMenuForm.Show();
         }
 
         private void InitializeGrids(int[,] savedPlayerGrid = null)
