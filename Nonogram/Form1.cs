@@ -85,6 +85,10 @@ namespace Nonogram
             
         }
 
+        public Form1()
+        {
+        }
+
         //hombutton click event
         private void BackButton_Click(object sender, EventArgs e)
         {
@@ -96,10 +100,6 @@ namespace Nonogram
 
         private void InitializeGrids(int[,] savedPlayerGrid = null)
         {
-            timer1.Start();
-            _start = DateTime.Now;
-            solutionGrid = GenerateRandomSolution(GridSize, GridSize);
-
             if (savedPlayerGrid != null)
             {
                 // Use the saved player grid if available
@@ -109,8 +109,22 @@ namespace Nonogram
             {
                 // Initialize a new empty player grid
                 playerGrid = new int[GridSize, GridSize];
+
+                // If no saved grid, set all cells to 0 for a fresh start.
+                for (int i = 0; i < GridSize; i++)
+                {
+                    for (int j = 0; j < GridSize; j++)
+                    {
+                        playerGrid[i, j] = 0;
+                    }
+                }
             }
-            playerGrid = savedPlayerGrid ?? new int[GridSize, GridSize];
+
+            timer1.Start();
+            _start = DateTime.Now;
+
+            // Generate the solution grid
+            solutionGrid = GenerateRandomSolution(GridSize, GridSize);
         }
 
         private void InitializeSolvedPuzzlesLabel()
@@ -276,7 +290,7 @@ namespace Nonogram
         }
 
         // Handles mouse click events on the game board
-        private async void OnMouseClick(object sender, MouseEventArgs e)
+        public async void OnMouseClick(object sender, MouseEventArgs e)
         {
             int gridStartX = ClueSize;
             int gridStartY = ClueSize;
@@ -654,10 +668,11 @@ namespace Nonogram
             }
         }
 
-        private async void NewPuzzleBtn_Click(object sender, EventArgs e)
+        public async void NewPuzzleBtn_Click(object sender, EventArgs e)
         {
             PlayerSolved = true; // Mark current puzzle as completed
-
+            timer1.Start();
+            _start = DateTime.Now;
             // Run puzzle initialization in a background thread
             await Task.Run(() =>
             {
@@ -684,7 +699,7 @@ namespace Nonogram
         private void timer1_Tick(object sender, EventArgs e)
         {
             // Show elapsed time in the correct  format
-            labelTime.Text = (DateTime.Now - _start).ToString(@"mm\:ss");
+            labelTime.Text = (DateTime.Now - _start).ToString(@"hh\:mm\:ss");
         }
 
         private void label4_Click(object sender, EventArgs e)

@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nonogram", "Nonogram\Nonogr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NonogramTest", "NonogramTest\NonogramTest.csproj", "{26E04531-12D3-40D7-9318-8068984CC8B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nonogram.Test", "Nonogram.Test\Nonogram.Test.csproj", "{886560BA-DD86-4D6D-8234-75FEA5337972}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NonogramTest2", "Nonogram.Test\NonogramTest2.csproj", "{886560BA-DD86-4D6D-8234-75FEA5337972}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
